@@ -1,0 +1,9 @@
+# the executable created
+./haskbot
+
+# everything else
+.DS_Store
+
+# created curing compilation
+*.hi
+*.o
