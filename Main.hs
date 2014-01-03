@@ -2,35 +2,36 @@ module Main (main) where
 
 import Control.Monad (msum)
 import Data.Char (toLower)
+import qualified Slack.Responder as S
 
 import Happstack.Server
-  ( FromReqURI(..)
+  ( BodyPolicy
+  , Method (POST)
+  , Response
+  , ServerPart
+  , decodeBody
+  , defaultBodyPolicy
   , dir
+  , method
   , nullConf
-  , ok
-  , path
-  , seeOther
   , simpleHTTP
-  , toResponse
   )
 
-data Subject = World | Haskell
-
-instance FromReqURI Subject where
-  fromReqURI sub =
-    case (map toLower sub) of
-      "haskell" -> Just Haskell
-      "world"   -> Just World
-      _         -> Nothing
-
--- does this automatically coerce? don't understand
-sayHello :: Subject -> String
-sayHello World    = "Hello, world!"
-sayHello Haskell  = "Haskell is awesome!"
+--
+-- public functions
+--
 
 main :: IO ()
-main =
-  simpleHTTP nullConf $ msum
-    [ dir "hello"   $ path (\s -> ok $ sayHello s)
-    , dir "goodbye" $ path (\s -> path (\t -> ok $ s ++ " " ++ t))
-    ]
+main = simpleHTTP nullConf $ do
+  decodeBody bodyPolicy
+  msum routes
+
+--
+-- private functions
+--
+
+bodyPolicy :: BodyPolicy
+bodyPolicy = defaultBodyPolicy "/tmp/" 0 1000 1000
+
+routes :: [ServerPart Response]
+routes = [ dir "slack" $ S.respondToMsg ]
