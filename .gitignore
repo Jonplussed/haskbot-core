@@ -1,5 +1,5 @@
 # the executable created
-./haskbot
+haskbot
 
 # everything else
 .DS_Store
