@@ -15,7 +15,7 @@ import Happstack.Server
   , ServerPart
   , badRequest
   , body
-  , checkRq
+  , checkRqM
   , getData
   , look
   , ok
@@ -40,9 +40,13 @@ instance FromData SlackMsg where
 respondToMsg :: ServerPart Response
 respondToMsg = do
   r <- getData
+  tActual <- liftIO $ getEnv tokenEnvVar
+  tReceived <- look "token"
   case (r) of
-    (Left e)    -> badRequest . toResponse $ unlines e
-    (Right msg) -> craftResponse msg
+    (Left e) -> badRequest . toResponse $ unlines e
+    (Right msg)
+      | tActual == tReceived -> craftResponse msg
+      | otherwise -> badRequest $ toResponse "unauthorized request"
 
 --
 -- private functions
@@ -50,10 +54,3 @@ respondToMsg = do
 
 craftResponse :: SlackMsg -> ServerPart Response
 craftResponse msg = ok . toResponse $ (user msg) ++ ": " ++ (text msg)
-
--- validateToken msg = look "token" `checkRq` validate
---   where validate token = do
---             t <- liftIO $ getEnv tokenEnvVar
---             if token == t
---               then return $ Right msg
---               else return $ Left "unauthorized request"
