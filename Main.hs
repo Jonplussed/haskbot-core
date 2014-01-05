@@ -1,18 +1,15 @@
 module Main (main) where
 
 import Control.Monad (msum)
-import Data.Char (toLower)
 import qualified Slack.Responder as S
 
 import Happstack.Server
   ( BodyPolicy
-  , Method (POST)
   , Response
   , ServerPart
   , decodeBody
   , defaultBodyPolicy
   , dir
-  , method
   , nullConf
   , simpleHTTP
   )
@@ -34,4 +31,4 @@ bodyPolicy :: BodyPolicy
 bodyPolicy = defaultBodyPolicy "/tmp/" 0 1000 1000
 
 routes :: [ServerPart Response]
-routes = [ dir "slack" $ S.respondToMsg ]
+routes = [ dir "slack" S.respondToMsg ]

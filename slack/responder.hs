@@ -16,6 +16,7 @@ import Happstack.Server
   , toResponse
   )
 
+tokenEnvVar :: String
 tokenEnvVar = "SLACK_TOKEN"
 
 --
@@ -25,7 +26,7 @@ tokenEnvVar = "SLACK_TOKEN"
 respondToMsg :: ServerPart Response
 respondToMsg = do
   r <- getData >>= validateToken
-  case (r) of
+  case r of
     (Left e) -> badRequest . toResponse $ unlines e
     (Right msg) -> S.responseFor msg
 
