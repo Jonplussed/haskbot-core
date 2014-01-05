@@ -1,5 +1,5 @@
 module Slack.Responder
-  ( Message(..)
+  ( SlackMsg(..)
   , respondToMsg
   ) where
 
@@ -9,23 +9,29 @@ import qualified Data.Map as M
 import System.Environment (getEnv)
 
 import Happstack.Server
-  ( Response
+  ( FromData (fromData)
+  , Response
   , RqData
   , ServerPart
   , badRequest
   , body
-  , getDataFn
+  , checkRq
+  , getData
   , look
   , ok
   , toResponse
+  , withData
   )
 
-data Message = Message { token :: String
-                       , user  :: String
-                       , text  :: String
-                       } deriving (Show)
-
 tokenEnvVar = "SLACK_TOKEN"
+
+data SlackMsg =
+  SlackMsg { user :: String, text :: String }
+  deriving (Eq, Show)
+
+instance FromData SlackMsg where
+  fromData = SlackMsg <$> bl "user_name" <*> bl "text"
+    where bl = body . look
 
 --
 -- public functions
@@ -33,25 +39,21 @@ tokenEnvVar = "SLACK_TOKEN"
 
 respondToMsg :: ServerPart Response
 respondToMsg = do
-  r <- getDataFn slackRq
-  t <- liftIO $ getEnv tokenEnvVar
+  r <- getData
   case (r) of
-    (Left e) ->
-      badResp $ unlines e
-    (Right msg) ->
-      if (token msg) == t
-      then craftResponse msg
-      else badResp "unauthorized request"
-  where badResp = badRequest . toResponse
+    (Left e)    -> badRequest . toResponse $ unlines e
+    (Right msg) -> craftResponse msg
 
 --
 -- private functions
 --
 
-craftResponse :: Message -> ServerPart Response
+craftResponse :: SlackMsg -> ServerPart Response
 craftResponse msg = ok . toResponse $ (user msg) ++ ": " ++ (text msg)
 
--- required params: token, user_name, text
-slackRq :: RqData Message
-slackRq = Message <$> bl "token" <*> bl "user_name" <*> bl "text"
-  where bl = body . look
+-- validateToken msg = look "token" `checkRq` validate
+--   where validate token = do
+--             t <- liftIO $ getEnv tokenEnvVar
+--             if token == t
+--               then return $ Right msg
+--               else return $ Left "unauthorized request"
