@@ -55,6 +55,8 @@ validateToken :: Either [String] SlackMsg -> ServerPart (Either [String] SlackMs
 validateToken msg = do
   tActual <- liftIO $ getEnv tokenEnvVar
   tReceived <- look "token"
-  if tActual == tReceived
-  then return msg
-  else return $ Left ["unauthorized request"]
+  let validate m =
+        if tActual == tReceived
+        then Right m
+        else Left ["unauthorized request"]
+  return $ msg >>= validate
