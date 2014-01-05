@@ -7,3 +7,6 @@ haskbot
 # created curing compilation
 *.hi
 *.o
+.cabal-sandbox
+cabal.sandbox.config
+dist
