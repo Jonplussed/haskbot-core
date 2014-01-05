@@ -39,14 +39,10 @@ instance FromData SlackMsg where
 
 respondToMsg :: ServerPart Response
 respondToMsg = do
-  r <- getData
-  tActual <- liftIO $ getEnv tokenEnvVar
-  tReceived <- look "token"
+  r <- getData >>= validateToken
   case (r) of
     (Left e) -> badRequest . toResponse $ unlines e
-    (Right msg)
-      | tActual == tReceived -> craftResponse msg
-      | otherwise -> badRequest $ toResponse "unauthorized request"
+    (Right msg) -> craftResponse msg
 
 --
 -- private functions
@@ -54,3 +50,11 @@ respondToMsg = do
 
 craftResponse :: SlackMsg -> ServerPart Response
 craftResponse msg = ok . toResponse $ (user msg) ++ ": " ++ (text msg)
+
+validateToken :: Either [String] SlackMsg -> ServerPart (Either [String] SlackMsg)
+validateToken msg = do
+  tActual <- liftIO $ getEnv tokenEnvVar
+  tReceived <- look "token"
+  if tActual == tReceived
+  then return msg
+  else return $ Left ["unauthorized request"]
