@@ -14,7 +14,7 @@ import Happstack.Server
 --
 
 responseFor :: S.SlackMsg -> ServerPart Response
-responseFor msg = ok . toResponse $ (S.user msg) ++ ": " ++ (S.text msg)
+responseFor msg = ok . toResponse $ S.user msg ++ ": " ++ S.text msg
 
 --
 -- private functions

@@ -10,10 +10,9 @@ import Happstack.Server
   , look
   )
 
-data SlackMsg =
-  SlackMsg { user :: String, text :: String }
-  deriving (Eq, Show)
+data SlackMsg = SlackMsg { user :: String, text :: String }
+              deriving (Eq, Show)
 
 instance FromData SlackMsg where
   fromData = SlackMsg <$> bl "user_name" <*> bl "text"
-    where bl = body . look
+           where bl = body . look

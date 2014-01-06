@@ -16,9 +16,6 @@ import Happstack.Server
   , toResponse
   )
 
-tokenEnvVar :: String
-tokenEnvVar = "SLACK_TOKEN"
-
 --
 -- public functions
 --
@@ -26,20 +23,20 @@ tokenEnvVar = "SLACK_TOKEN"
 respondToMsg :: ServerPart Response
 respondToMsg = do
   r <- getData >>= validateToken
-  case r of
-    (Left e) -> badRequest . toResponse $ unlines e
-    (Right msg) -> S.responseFor msg
+  case r of (Left e)    -> badRequest . toResponse $ unlines e
+            (Right msg) -> S.responseFor msg
 
 --
 -- private functions
 --
 
+tokenEnvVar :: String
+tokenEnvVar = "SLACK_TOKEN"
+
 validateToken :: Either [String] S.SlackMsg -> ServerPart (Either [String] S.SlackMsg)
 validateToken msg = do
   tActual <- liftIO $ getEnv tokenEnvVar
   tReceived <- look "token"
-  let validate m =
-        if tActual == tReceived
-        then Right m
-        else Left ["unauthorized request"]
-  return $ msg >>= validate
+  return $ msg >>= \m -> if tActual == tReceived
+                         then Right m
+                         else Left ["unauthorized request"]

@@ -20,6 +20,6 @@ favorite of languages.
 I'm totally in over my head, so if you'd like to improve upon my codebase,
 please do!
 
-## LICENSE
+## License
 
 See `LICENSE.txt`
