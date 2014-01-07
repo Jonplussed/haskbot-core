@@ -4,7 +4,7 @@ haskbot
 # everything else
 .DS_Store
 
-# created curing compilation
+# possibly created curing compilation
 *.hi
 *.o
 .cabal-sandbox
