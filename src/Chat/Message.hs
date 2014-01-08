@@ -1,40 +1,16 @@
 module Chat.Message
   ( Message
+  , from
+  , message
   , text
-  , user
   ) where
 
-import Control.Applicative ((<$>), (<*>))
-
-import Happstack.Server
-  ( FromData
-  , body
-  , fromData
-  , look
-  )
-
-data Message = Message { user :: String, text :: String }
-              deriving (Eq, Show)
-
-instance FromData Message where
-  fromData = message <$> bl "user_name" <*> bl "text"
-           where bl = body . look
+data Message = Message { from :: String, text :: String }
+             deriving (Eq, Show)
 
 --
--- private functions
+-- public functions
 --
 
 message :: String -> String -> Message
-message u t = Message u $ cleanUp t
-
--- when I feel like being programmatic, I'll program something
--- prefixes :: [String]
--- prefixes =
---   [ "@haskbot: "
---   , "haskbot: "
---   , "@haskbot:"
---   , "haskbot:"
---   ]
-
-cleanUp :: String -> String
-cleanUp txt = txt
+message f t = Message f t

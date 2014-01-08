@@ -1,36 +1,58 @@
 module Protocols.Slack (respond) where
 
+import Control.Applicative ((<$>), (<*>))
 import Control.Monad.IO.Class (liftIO)
 import System.Environment (getEnv)
 
-import Chat.Message (Message)
+import Chat.Message (Message, message)
 import Hasklet.All (unleashUpon)
 
 import Happstack.Server
   ( Response
+  , RqData
   , ServerPart
   , badRequest
-  , getData
+  , body
+  , getDataFn
   , look
   , ok
   , toResponse
   )
 
-type PendingResponse = Either [String] Message
-
-respond :: ServerPart Response
-respond = do
-  r <- getData >>= validateToken
-  case r of (Left e)    -> badRequest . toResponse $ unlines e
-            (Right msg) -> ok . toResponse $ unleashUpon msg
-
 tokenEnvVar :: String
 tokenEnvVar = "SLACK_TOKEN"
 
-validateToken :: PendingResponse -> ServerPart (PendingResponse)
-validateToken msg = do
+--
+-- public functions
+--
+
+respond :: ServerPart Response
+respond = do
+  isValid <- hasValidToken
+  if isValid
+  then parseData
+  else bad "unauthorized request"
+
+--
+-- private functions
+--
+
+good, bad :: String -> ServerPart Response
+good = ok . toResponse
+bad  = badRequest . toResponse
+
+formatMsg :: RqData Message
+formatMsg = message <$> bl "user_name" <*> bl "text"
+          where bl = body . look
+
+hasValidToken :: ServerPart Bool
+hasValidToken = do
   tActual <- liftIO $ getEnv tokenEnvVar
   tReceived <- look "token"
-  return $ msg >>= \m -> if tActual == tReceived
-                         then Right m
-                         else Left ["unauthorized request"]
+  return $ tActual == tReceived
+
+parseData :: ServerPart Response
+parseData = do
+  r <- getDataFn formatMsg
+  case r of (Left e)    -> bad $ unlines e
+            (Right msg) -> good $ unleashUpon msg
