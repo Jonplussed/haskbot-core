@@ -1,4 +1,4 @@
-module Connectors.Web (server) where
+module Connections.Web (server) where
 
 import qualified Protocols.Slack as Slack
 
