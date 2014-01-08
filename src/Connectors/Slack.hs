@@ -1,11 +1,12 @@
-module Connector.Slack
+module Connectors.Slack
   ( server
   ) where
 
 import Control.Monad.IO.Class (liftIO)
 import System.Environment (getEnv)
-import Hasklets (unleashUpon)
-import Message (Message)
+
+import Hasklet.All (unleashUpon)
+import Chat.Message (Message)
 
 import Happstack.Server
   ( BodyPolicy

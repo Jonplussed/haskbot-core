@@ -1,4 +1,4 @@
-module Hasklet.Base
+module Hasklet.Skeleton
 ( Hasklet
 , hasklet
 , reaction
