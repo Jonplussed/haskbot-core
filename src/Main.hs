@@ -1,6 +1,6 @@
 module Main (main) where
 
-import qualified Connectors.Slack as Slack
+import qualified Connectors.Web as Web
 
 main :: IO ()
-main = Slack.server
+main = Web.server

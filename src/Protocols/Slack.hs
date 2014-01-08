@@ -1,49 +1,25 @@
-module Connectors.Slack
-  ( server
-  ) where
+module Protocols.Slack (respond) where
 
 import Control.Monad.IO.Class (liftIO)
 import System.Environment (getEnv)
 
-import Hasklet.All (unleashUpon)
 import Chat.Message (Message)
+import Hasklet.All (unleashUpon)
 
 import Happstack.Server
-  ( BodyPolicy
-  , Response
+  ( Response
   , ServerPart
   , badRequest
-  , decodeBody
-  , defaultBodyPolicy
-  , dir
   , getData
   , look
-  , nullConf
   , ok
-  , simpleHTTP
   , toResponse
   )
 
 type PendingResponse = Either [String] Message
 
---
--- public functions
---
-
-server :: IO ()
-server = simpleHTTP nullConf $ do
-  decodeBody bodyPolicy
-  dir "slack" replyToMsg
-
---
--- private functions
---
-
-bodyPolicy :: BodyPolicy
-bodyPolicy = defaultBodyPolicy "/tmp/" 0 1000 1000
-
-replyToMsg :: ServerPart Response
-replyToMsg = do
+respond :: ServerPart Response
+respond = do
   r <- getData >>= validateToken
   case r of (Left e)    -> badRequest . toResponse $ unlines e
             (Right msg) -> ok . toResponse $ unleashUpon msg
