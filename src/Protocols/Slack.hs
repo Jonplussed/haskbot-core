@@ -28,10 +28,9 @@ tokenEnvVar = "SLACK_TOKEN"
 
 respond :: ServerPart Response
 respond = do
-  isValid <- hasValidToken
-  if isValid
-  then parseData
-  else bad "unauthorized request"
+  v <- hasValidToken
+  case v of True  -> parseData
+            False -> bad "unauthorized request"
 
 --
 -- private functions
@@ -41,9 +40,13 @@ good, bad :: String -> ServerPart Response
 good = ok . toResponse
 bad  = badRequest . toResponse
 
+cleanAttrs :: String -> String -> Message
+cleanAttrs from text = message from' text
+  where from' = '@' : from
+
 formatMsg :: RqData Message
-formatMsg = message <$> bl "user_name" <*> bl "text"
-          where bl = body . look
+formatMsg = cleanAttrs <$> bl "user_name" <*> bl "text"
+  where bl = body . look
 
 hasValidToken :: ServerPart Bool
 hasValidToken = do
