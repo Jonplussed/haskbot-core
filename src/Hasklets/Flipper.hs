@@ -1,5 +1,6 @@
 module Hasklets.Flipper (angryFlip) where
 
+import Data.Char
 import Data.List (foldl')
 import qualified Data.Map as M
 
@@ -16,9 +17,8 @@ angryFlip = hasklet trigger reaction
 -- private methods
 --
 
-flippedLets, flipper, trigger, uprightLets :: String
+flippedLets, trigger, uprightLets :: String
 trigger = "^flip (.*)$"
-flipper = "(╯°□°）╯︵ "
 uprightLets = "abcdefghijklmnopqrstuvwxyz.!?()[]<>"
 flippedLets = "ɐqɔpǝɟƃɥᴉɾʞlɯuodbɹsʇnʌʍxʎz˙¡¿)(][><"
 
@@ -29,9 +29,10 @@ charMap = M.fromList $ zip (u ++ f) (f ++ u)
     f = flippedLets
 
 reaction :: String -> [String] -> String
-reaction _ matches = flipper ++ (tableFlip $ head matches)
+reaction _ matches = "(╯°□°）╯︵ " ++ (tableFlip $ head matches)
 
 tableFlip :: String -> String
 tableFlip "table" = "┻━┻"
 tableFlip str = foldl' flipLet "" str
-  where flipLet s l = M.findWithDefault l l charMap : s
+  where
+    flipLet s l = M.findWithDefault l (toLower l) charMap : s
