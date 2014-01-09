@@ -19,4 +19,4 @@ data Message = Message { from :: String, text :: String }
 -- (this will have to go if any protocols violate this)
 message :: String -> String -> Message
 message f t = Message f t'
-  where t' = tail . unwords $ words t
+  where t' = unwords . tail $ words t
