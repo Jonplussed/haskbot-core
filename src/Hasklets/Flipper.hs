@@ -1,5 +1,6 @@
 module Hasklets.Flipper (angryFlip) where
 
+import Data.List (foldl')
 import qualified Data.Map as M
 
 import Hasklet.Skeleton (Hasklet, hasklet)
@@ -32,3 +33,5 @@ reaction _ matches = flipper ++ (tableFlip $ head matches)
 
 tableFlip :: String -> String
 tableFlip "table" = "┻━┻"
+tableFlip str = foldl' flipLet "" str
+  where flipLet s l = M.findWithDefault l l charMap : s

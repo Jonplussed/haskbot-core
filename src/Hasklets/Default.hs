@@ -9,4 +9,4 @@ trigger :: String
 trigger = "."
 
 reaction :: String -> [String] -> String
-reaction username _ = "/sighs passive-aggressively at " ++ username
+reaction username _ = "/me sighs passive-aggressively at " ++ username
