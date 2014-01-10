@@ -29,7 +29,7 @@ tokenEnvVar = "SLACK_TOKEN"
 respond :: ServerPart Response
 respond = do
   v <- hasValidToken
-  case v of True  -> parseData
+  case v of True  -> genReply
             False -> bad "unauthorized request"
 
 --
@@ -40,13 +40,15 @@ good, bad :: String -> ServerPart Response
 good = ok . toResponse
 bad  = badRequest . toResponse
 
-cleanAttrs :: String -> String -> Message
-cleanAttrs from text = message from' text
+formatMsg :: String -> String -> Message
+formatMsg from text = message from' text
   where from' = '@' : from
 
-formatMsg :: RqData Message
-formatMsg = cleanAttrs <$> bl "user_name" <*> bl "text"
-  where bl = body . look
+genReply :: ServerPart Response
+genReply = do
+  r <- getDataFn msgFromPost
+  case r of (Left e)    -> bad $ unlines e
+            (Right msg) -> good $ unleashUpon msg
 
 hasValidToken :: ServerPart Bool
 hasValidToken = do
@@ -54,8 +56,6 @@ hasValidToken = do
   tReceived <- look "token"
   return $ tActual == tReceived
 
-parseData :: ServerPart Response
-parseData = do
-  r <- getDataFn formatMsg
-  case r of (Left e)    -> bad $ unlines e
-            (Right msg) -> good $ unleashUpon msg
+msgFromPost :: RqData Message
+msgFromPost = formatMsg <$> bl "user_name" <*> bl "text"
+  where bl = body . look
