@@ -5,7 +5,9 @@ module Chat.Message
   , text
   ) where
 
+import Data.List (isInfixOf)
 import Data.String (words, unwords)
+import Settings (chatbotName)
 
 data Message = Message { from :: String, text :: String }
              deriving (Eq, Show)
@@ -14,9 +16,15 @@ data Message = Message { from :: String, text :: String }
 -- public functions
 --
 
--- every message begins with calling Haskbot, so to simplify we eliminate
--- the first word and condense whitespace from the get-go
--- (this will have to go if any protocols violate this)
 message :: String -> String -> Message
-message f t = Message f t'
-  where t' = unwords . tail $ words t
+message f t = Message f $ removeDM t
+
+--
+-- private functions
+--
+
+removeDM :: String -> String
+removeDM text
+  | chatbotName `isInfixOf` head w = unwords $ tail w
+  | otherwise                      = unwords w
+  where w = words text

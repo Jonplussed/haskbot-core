@@ -5,7 +5,6 @@ import Text.Regex (matchRegex, mkRegex)
 import Chat.Message (Message, from, text)
 import Hasklet.Register (hasklets)
 import Hasklet.Skeleton (Hasklet, trigger, reaction)
-import Hasklets.Default (passiveSigh)
 
 --
 -- public functions
@@ -20,7 +19,7 @@ unleashUpon msg = applyHasklet msg hasklets
 
 -- this explicit recursion can probably be replaced with something better
 applyHasklet :: Message -> [Hasklet] -> String
-applyHasklet msg [] = (reaction passiveSigh) (from msg) []
+applyHasklet msg [] = error "no hasklets matched the given input"
 applyHasklet msg (h:hs) =
   case (matchRegex regex $ text msg) of
     Just matches -> (reaction h) (from msg) matches

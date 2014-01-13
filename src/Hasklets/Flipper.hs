@@ -3,7 +3,6 @@ module Hasklets.Flipper (angryFlip) where
 import Data.Char
 import Data.List (foldl')
 import qualified Data.Map as M
-
 import Hasklet.Skeleton (Hasklet, hasklet)
 
 --

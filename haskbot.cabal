@@ -1,35 +1,46 @@
-name:                haskbot
-version:             0.0.1.0
-maintainer:          Jon Childress <jon@childr.es>
-homepage:            https://github.com/jonplussed/haskbot
+name:                 haskbot
+version:              0.0.1.0
+maintainer:           Jon Childress <jon@childr.es>
+homepage:             https://github.com/jonplussed/haskbot
 
-license:             ROFLCOPTER
-license-file:        LICENSE.txt
-copyright:           (c) 2011-2013 Simon Hengel
+license:              ROFLCOPTER
+license-file:         LICENSE.txt
+copyright:            (c) 2011-2013 Simon Hengel
 
-synopsis:            A Haskell-based chatbot for Slack, IRC, etc
-description:         A chatbot for use in Slack, IRC, or any other webchat
-                     protocol. Requires a connector for each protocol, and can
-                     then be started as a server for any. Responses are
-                     generated via "Hasklets".
+synopsis:             A Haskell-based chatbot for Slack, IRC, etc
+description:          A chatbot for use in Slack, IRC, or any other webchat
+                      protocol. Requires a connector for each protocol, and can
+                      then be started as a server for any. Responses are
+                      generated via "Hasklets".
 
+stability:            volatile
+category:             web
+build-type:           Simple
+extra-source-files:   README.md
+cabal-version:        >=1.10
 
-stability:           volatile
-category:            web
-build-type:          Simple
-extra-source-files:  README.md
-cabal-version:       >=1.10
+source-repository     head
+  type:               git
+  location:           https://github.com/jonplussed/haskbot
 
-source-repository    head
-  type:              git
-  location:          https://github.com/jonplussed/haskbot
+executable            haskbot
+  hs-source-dirs:     src
+  main-is:            Main.hs
+  build-depends:      base >=4.6 && <4.7,
+                      regex-compat >=0.95 && <0.96,
+                      happstack-server >=7.3 && <7.4,
+                      transformers >=0.3 && <0.4,
+                      containers
+  default-language:   Haskell2010
 
-executable           haskbot
-  main-is:           main.hs
-  build-depends:     base >=4.6 && <4.7,
-                     regex-compat >=0.95 && <0.96,
-                     happstack-server >=7.3 && <7.4,
-                     transformers >=0.3 && <0.4,
-                     containers
-  hs-source-dirs:    src
-  default-language:  Haskell2010
+test-suite            spec
+  hs-source-dirs:     src, test
+  main-is:            Spec.hs
+  build-depends:      base >=4.6 && <4.7,
+                      regex-compat >=0.95 && <0.96,
+                      happstack-server >=7.3 && <7.4,
+                      transformers >=0.3 && <0.4,
+                      containers,
+                      hspec >=1.8 && <1.9
+  type:               exitcode-stdio-1.0
+  default-language:   Haskell2010
