@@ -12,7 +12,7 @@ import Test.Hspec
 confirmResponses :: [(String, String)] -> Spec
 confirmResponses rs = do
   forM_ rs $ \(t,r) ->
-    it ("correctly responds to \"" ++ t ++ "\"...") $ do
+    it ("correctly responds to \"" ++ t ++ "\"") $ do
       unleashUpon (message usernameStub t) `shouldBe` r
 
 --

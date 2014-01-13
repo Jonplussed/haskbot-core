@@ -17,14 +17,18 @@ data Message = Message { from :: String, text :: String }
 --
 
 message :: String -> String -> Message
-message f t = Message f $ removeDM t
+message f t = Message f $ cleanDM t
 
 --
 -- private functions
 --
 
-removeDM :: String -> String
-removeDM text
+cleanDM :: String -> String
+cleanDM text
+  -- replace an all-whitespace message with ellipsis
+  | null w                         = "..."
+  -- remove the chatbot name from the front of the message
   | chatbotName `isInfixOf` head w = unwords $ tail w
+  -- otherwise leave alone
   | otherwise                      = unwords w
   where w = words text
