@@ -30,7 +30,8 @@ executable            haskbot
                       regex-compat >=0.95 && <0.96,
                       happstack-server >=7.3 && <7.4,
                       transformers >=0.3 && <0.4,
-                      containers
+                      containers,
+                      parsec >=3.1
   default-language:   Haskell2010
 
 test-suite            spec
@@ -41,6 +42,7 @@ test-suite            spec
                       happstack-server >=7.3 && <7.4,
                       transformers >=0.3 && <0.4,
                       containers,
+                      parsec >=3.1,
                       hspec >=1.8 && <1.9
   type:               exitcode-stdio-1.0
   default-language:   Haskell2010

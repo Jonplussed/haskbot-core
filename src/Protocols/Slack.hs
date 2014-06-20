@@ -3,6 +3,12 @@ module Protocols.Slack (respond) where
 import Control.Applicative ((<$>), (<*>))
 import Control.Monad.IO.Class (liftIO)
 import System.Environment (getEnv)
+import Text.Parsec.Char
+import Text.Parsec.Combinator
+import Text.Parsec.Error
+import Text.Parsec.Prim
+import Text.Parsec.String
+import Text.Printf
 
 import Happstack.Server
   ( Response
@@ -14,9 +20,15 @@ import Happstack.Server
   , look
   , ok
   , toResponse
+  , unauthorized
+  , setResponseCode
   )
 
-data SlackMsg = SlackMsg { channelName :: String
+import Hasklets (hasklets)
+import Settings
+
+data SlackMsg = SlackMsg { secretToken :: String
+                         , channelName :: String
                          , timeStamp   :: String
                          , userName    :: String
                          , msgText     :: String
@@ -29,34 +41,49 @@ tokenEnvVar = "SLACK_TOKEN"
 
 -- public functions
 
-respond :: ServerPart Response
-respond = do
-  isValid <- hasValidToken
-  case isValid of
-    True  -> replyToSlack
-    False -> bad "unauthorized request"
+respond :: ServerPart String
+respond = parseRequest
 
 -- private functions
 
-hasValidToken :: ServerPart Bool
-hasValidToken = do
-  tActual <- liftIO $ getEnv tokenEnvVar
-  tReceived <- look "token"
-  return $ tActual == tReceived
+parseRequest :: ServerPart String
+parseRequest = do
+    msg <- getDataFn slackMsg
+    case msg of
+      Left errors -> badRequest $ unlines errors
+      Right m     -> validateToken m
+
+validateToken :: SlackMsg -> ServerPart String
+validateToken msg = do
+    token <- liftIO $ getEnv tokenEnvVar
+    if token == secretToken msg
+      then craftResponse msg
+      else unauthorized "invalid secret token"
+
+craftResponse :: SlackMsg -> ServerPart String
+craftResponse msg =
+    case applyHasklets msg of
+      Right str -> ok $ toJSON str (userName msg)
+      Left err -> badRequest $ show err
+  where
 
 slackMsg :: RqData SlackMsg
-slackMsg = SlackMsg <$> bl "channel_name"
+slackMsg = SlackMsg <$> bl "token"
+                    <*> bl "channel_name"
                     <*> bl "timestamp"
                     <*> bl "user_name"
                     <*> bl "text"
   where bl = body . look
 
-replyToSlack :: ServerPart Response
-replyToSlack = do
-    r <- getDataFn slackMsg
-    case r of (Left e)         -> bad $ unlines e
-              (Right slackMsg) -> good $ "hello"
+applyHasklets :: SlackMsg -> Either ParseError String
+applyHasklets msg = parse parser str str
+  where
+    parser = do
+        string chatbotName
+        try $ char ':'
+        spaces
+        choice hasklets
+    str = msgText msg
 
-good, bad :: String -> ServerPart Response
-good = ok . toResponse
-bad  = badRequest . toResponse
+toJSON :: String -> String -> String
+toJSON = printf "{\"text\":\"%s\", \"username\":\"%s\"}"

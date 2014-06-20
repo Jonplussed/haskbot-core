@@ -3,21 +3,27 @@ module Hasklets.Flipper (angryFlip) where
 import Data.Char
 import Data.List (foldl')
 import qualified Data.Map as M
-import Hasklet.Skeleton (Hasklet, hasklet)
 
---
--- public methods
---
+import Text.Parsec.String
+import Text.Parsec.Char
+import Text.Parsec.Combinator
+import Text.Parsec.Error
+import Text.Parsec.Prim
 
-angryFlip :: Hasklet
-angryFlip = hasklet trigger reaction
+import Settings
 
---
--- private methods
---
+-- public functions
 
-flippedLets, trigger, uprightLets :: String
-trigger = "^flip (.*)$"
+angryFlip :: Parser String
+angryFlip = do
+    string "flip"
+    space
+    toFlip <- manyTill anyChar eof
+    return $ reaction toFlip
+
+-- private functions
+
+flippedLets, uprightLets :: String
 uprightLets = "abcdefghijklmnopqrstuvwxyz.!?()[]<>"
 flippedLets = "ɐqɔpǝɟƃɥᴉɾʞlɯuodbɹsʇnʌʍxʎz˙¡¿)(][><"
 
@@ -27,8 +33,8 @@ charMap = M.fromList $ zip (u ++ f) (f ++ u)
     u = uprightLets
     f = flippedLets
 
-reaction :: String -> [String] -> String
-reaction _ matches = "(╯°□°）╯︵ " ++ (tableFlip $ head matches)
+reaction :: String -> String
+reaction str = "(╯°□°）╯︵ " ++ tableFlip str
 
 tableFlip :: String -> String
 tableFlip "table" = "┻━┻"
