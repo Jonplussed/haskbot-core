@@ -18,7 +18,7 @@ import           Happstack.Server
 
 import qualified Protocols.Slack.Request   as SQ
 import qualified Protocols.Slack.Response  as SP
-import           Hasklets                  (hasklets)
+import           Registry                  (plugins)
 import           Settings
 
 -- public functions
@@ -41,17 +41,17 @@ validateToken msg = do
 
 craftResponse :: SQ.Request -> ServerPart Response
 craftResponse msg =
-    case applyHasklets msg of
+    case applyPlugins msg of
       Right str -> ok . toResponse $ SP.Response (SQ.userName msg) str
       Left err  -> badRequest . toResponse $ show err
 
-applyHasklets :: SQ.Request -> Either ParseError String
-applyHasklets msg = parse parser str str
+applyPlugins :: SQ.Request -> Either ParseError String
+applyPlugins msg = parse parser str str
   where
     parser = do
         optional $ char '@'
-        string chatbotName
+        string botName
         optional $ char ':'
         spaces
-        choice hasklets
+        choice plugins
     str = SQ.text msg

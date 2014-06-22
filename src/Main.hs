@@ -1,6 +1,6 @@
 module Main (main) where
 
-import qualified Connections.Web as Web
+import Server (server)
 
 main :: IO ()
-main = Web.server
+main = server

@@ -1,10 +1,10 @@
 module Settings
-  ( chatbotName
+  ( botName
   , slackTokenEnvVar
   ) where
 
-chatbotName :: String
-chatbotName = "haskbot"
+botName :: String
+botName = "haskbot"
 
 slackTokenEnvVar :: String
 slackTokenEnvVar = "SLACK_TOKEN"

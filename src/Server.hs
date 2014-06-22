@@ -1,4 +1,4 @@
-module Connections.Web (server) where
+module Server (server) where
 
 -- foreign libraries
 
@@ -13,14 +13,14 @@ import Happstack.Server
 
 -- native libraries
 
-import qualified Protocols.Slack.Handler as SH
+import qualified Protocols.Slack.Handler as Slack
 
 -- public functions
 
 server :: IO ()
 server = simpleHTTP nullConf $ do
   decodeBody bodyPolicy
-  dir "slack" SH.respond
+  dir "slack" Slack.respond
 
 -- private functions
 

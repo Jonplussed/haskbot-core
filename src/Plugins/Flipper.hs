@@ -1,14 +1,17 @@
-module Hasklets.Flipper (angryFlip) where
+module Plugins.Flipper (angryFlip) where
 
-import Data.Char
-import Data.List (foldl')
-import qualified Data.Map as M
+-- Haskell platform libraries
 
-import Text.Parsec.String
-import Text.Parsec.Char
-import Text.Parsec.Combinator
-import Text.Parsec.Error
-import Text.Parsec.Prim
+import           Data.Char
+import           Data.List              (foldl')
+import qualified Data.Map               as M
+import           Text.Parsec.String
+import           Text.Parsec.Char
+import           Text.Parsec.Combinator
+import           Text.Parsec.Error
+import           Text.Parsec.Prim
+
+-- native libraries
 
 import Settings
 
