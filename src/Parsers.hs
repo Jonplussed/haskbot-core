@@ -7,20 +7,15 @@ import Text.Parsec.Error
 import Text.Parsec.Prim
 
 type Plugin   = Parser String
-type UserName = String
 type Command  = String
 
 -- public functions
 
 commandWithArgs :: Command -> ([String] -> String) -> Plugin
-commandWithArgs com fn = do
-    args <- withArgs com
-    return . fn $ words args
+commandWithArgs com fn = withArgs com >>= return . fn . words
 
 commandWithText :: Command -> (String -> String) -> Plugin
-commandWithText com fn = do
-    text <- withArgs com
-    return $ fn text
+commandWithText com fn = withArgs com >>= return . fn
 
 -- private functions
 
