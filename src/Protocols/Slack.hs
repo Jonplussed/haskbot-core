@@ -1,28 +1,33 @@
-module Protocols.Slack (respond) where
+module Protocols.Slack
+  ( respond
+  ) where
 
-import Control.Applicative ((<$>), (<*>))
-import Control.Monad.IO.Class (liftIO)
-import System.Environment (getEnv)
-import Text.Parsec.Char
-import Text.Parsec.Combinator
-import Text.Parsec.Error
-import Text.Parsec.Prim
-import Text.Parsec.String
-import Text.Printf
+-- Haskell platform libraries
+
+import           Control.Applicative
+  ( (<$>)
+  , (<*>)
+  )
+import           Control.Monad.IO.Class
+  ( liftIO
+  )
+import qualified Data.ByteString.Char8     as B
+import qualified Data.ByteString.Lazy.UTF8 as LU
+import           System.Environment
+ ( getEnv
+ )
+import           Text.Parsec.Char
+import           Text.Parsec.Combinator
+import           Text.Parsec.Error
+import           Text.Parsec.Prim
+import           Text.Parsec.String
+import           Text.Printf
+
+-- Happstack
 
 import Happstack.Server
-  ( Response
-  , RqData
-  , ServerPart
-  , badRequest
-  , body
-  , getDataFn
-  , look
-  , ok
-  , toResponse
-  , unauthorized
-  , setResponseCode
-  )
+
+-- native libraries
 
 import Hasklets (hasklets)
 import Settings
@@ -30,42 +35,45 @@ import Settings
 data SlackMsg = SlackMsg { secretToken :: String
                          , channelName :: String
                          , timeStamp   :: String
-                         , userName    :: String
-                         , msgText     :: String
+                         , msgUserName    :: String
+                         , msgText        :: String
                          } deriving (Eq, Show)
 
--- constants
+data SlackResp = SlackResp { respUserName :: String
+                           , respText     :: String
+                           } deriving (Eq, Show)
 
-tokenEnvVar :: String
-tokenEnvVar = "SLACK_TOKEN"
+instance ToMessage SlackResp where
+  toContentType _ = B.pack "application/json"
+  toMessage     r = LU.fromString $ printf json (respUserName r) (respText r)
+    where json = "{\"username\":\"%s\",\"text\":\"%s\"}"
 
 -- public functions
 
-respond :: ServerPart String
+respond :: ServerPart Response
 respond = parseRequest
 
 -- private functions
 
-parseRequest :: ServerPart String
+parseRequest :: ServerPart Response
 parseRequest = do
     msg <- getDataFn slackMsg
     case msg of
-      Left errors -> badRequest $ unlines errors
+      Left errors -> badRequest . toResponse $ unlines errors
       Right m     -> validateToken m
 
-validateToken :: SlackMsg -> ServerPart String
+validateToken :: SlackMsg -> ServerPart Response
 validateToken msg = do
-    token <- liftIO $ getEnv tokenEnvVar
+    token <- liftIO $ getEnv slackTokenEnvVar
     if token == secretToken msg
       then craftResponse msg
-      else unauthorized "invalid secret token"
+      else unauthorized $ toResponse "invalid secret token"
 
-craftResponse :: SlackMsg -> ServerPart String
+craftResponse :: SlackMsg -> ServerPart Response
 craftResponse msg =
     case applyHasklets msg of
-      Right str -> ok $ toJSON str (userName msg)
-      Left err -> badRequest $ show err
-  where
+      Right str -> ok . toResponse $ SlackResp (msgUserName msg) str
+      Left err -> badRequest . toResponse $ show err
 
 slackMsg :: RqData SlackMsg
 slackMsg = SlackMsg <$> bl "token"
@@ -79,11 +87,9 @@ applyHasklets :: SlackMsg -> Either ParseError String
 applyHasklets msg = parse parser str str
   where
     parser = do
+        optional $ char '@'
         string chatbotName
-        try $ char ':'
+        optional $ char ':'
         spaces
         choice hasklets
     str = msgText msg
-
-toJSON :: String -> String -> String
-toJSON = printf "{\"text\":\"%s\", \"username\":\"%s\"}"
