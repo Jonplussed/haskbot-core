@@ -21,6 +21,5 @@ commandWithText com fn = withArgs com >>= return . fn
 
 withArgs :: String -> Plugin
 withArgs com = do
-    string com
-    space
+    try $ string com >> space
     manyTill anyChar eof
