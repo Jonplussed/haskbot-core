@@ -6,8 +6,8 @@ import Text.Parsec.String (Parser)
 
 -- native libraries
 
-import Plugins.Flipper    (angryFlip)
-import Parsers            (Plugin)
+import Plugins.TableFlip (tableFlip)
+import Parsers           (Plugin)
 
 type UserName = String
 
@@ -16,5 +16,5 @@ type UserName = String
 plugins :: UserName -> [Plugin]
 plugins withUser =
 
-  [ angryFlip
+  [ tableFlip
   ]

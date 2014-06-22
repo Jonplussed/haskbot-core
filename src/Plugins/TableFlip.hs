@@ -1,4 +1,4 @@
-module Plugins.Flipper (angryFlip) where
+module Plugins.TableFlip (tableFlip) where
 
 -- Haskell platform libraries
 
@@ -19,8 +19,8 @@ flippedLets = "ɐqɔpǝɟƃɥᴉɾʞlɯuodbɹsʇnʌʍxʎz˙¡¿)(][><"
 
 -- public functions
 
-angryFlip :: Plugin
-angryFlip = commandWithText "flip" output
+tableFlip :: Plugin
+tableFlip = commandWithText "flip" output
 
 -- private functions
 
@@ -31,10 +31,10 @@ charMap = M.fromList $ zip (u ++ f) (f ++ u)
     f = flippedLets
 
 output :: String -> String
-output str = "(╯°□°）╯︵ " ++ tableFlip str
+output str = "(╯°□°）╯︵ " ++ flipAnything str
 
-tableFlip :: String -> String
-tableFlip "table" = "┻━┻"
-tableFlip str = foldl' flipLet "" str
+flipAnything :: String -> String
+flipAnything "table" = "┻━┻"
+flipAnything str = foldl' flipLet "" str
   where
     flipLet s l = M.findWithDefault l (toLower l) charMap : s
