@@ -1,6 +1,6 @@
 module Connections.Web (server) where
 
-import qualified Protocols.Slack as Slack
+-- foreign libraries
 
 import Happstack.Server
   ( BodyPolicy
@@ -11,12 +11,16 @@ import Happstack.Server
   , simpleHTTP
   )
 
+-- native libraries
+
+import qualified Protocols.Slack.Handler as SH
+
 -- public functions
 
 server :: IO ()
 server = simpleHTTP nullConf $ do
   decodeBody bodyPolicy
-  dir "slack" Slack.respond
+  dir "slack" SH.respond
 
 -- private functions
 
