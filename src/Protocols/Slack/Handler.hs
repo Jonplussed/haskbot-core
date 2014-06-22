@@ -16,8 +16,8 @@ import           Happstack.Server
 
 -- native libraries
 
-import qualified Protocols.Slack.Request   as SQ
-import qualified Protocols.Slack.Response  as SP
+import qualified Protocols.Slack.Request   as Req
+import qualified Protocols.Slack.Response  as Res
 import           Registry                  (plugins)
 import           Settings
 
@@ -25,33 +25,33 @@ import           Settings
 
 respond :: ServerPart Response
 respond = do
-    msg <- getDataFn SQ.fromPost
-    case msg of
+    req <- getDataFn Req.fromPost
+    case req of
       Left errors -> badRequest . toResponse $ unlines errors
       Right m     -> validateToken m
 
 -- private functions
 
-validateToken :: SQ.Request -> ServerPart Response
-validateToken msg = do
+validateToken :: Req.Request -> ServerPart Response
+validateToken req = do
     token <- liftIO $ getEnv slackTokenEnvVar
-    if token == SQ.secretToken msg
-      then craftResponse msg
+    if token == Req.secretToken req
+      then craftResponse req
       else unauthorized $ toResponse "invalid secret token"
 
-craftResponse :: SQ.Request -> ServerPart Response
-craftResponse msg =
-    case applyPlugins msg of
-      Right str -> ok . toResponse $ SP.Response (SQ.userName msg) str
+craftResponse :: Req.Request -> ServerPart Response
+craftResponse req =
+    case applyPlugins req of
+      Right str -> ok . toResponse $ Res.Response (Req.userName req) str
       Left err  -> badRequest . toResponse $ show err
 
-applyPlugins :: SQ.Request -> Either ParseError String
-applyPlugins msg = parse parser str str
+applyPlugins :: Req.Request -> Either ParseError String
+applyPlugins req = parse parser str str
   where
     parser = do
         optional $ char '@'
         string botName
         optional $ char ':'
         spaces
-        choice plugins
-    str = SQ.text msg
+        choice . plugins $ Req.userName req
+    str = Req.text req

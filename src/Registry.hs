@@ -7,9 +7,14 @@ import Text.Parsec.String (Parser)
 -- native libraries
 
 import Plugins.Flipper    (angryFlip)
+import Parsers            (Plugin)
 
-type Plugins = [Parser String]
+type UserName = String
 
-plugins :: Plugins
-plugins = [ angryFlip
-          ]
+-- public functions
+
+plugins :: UserName -> [Plugin]
+plugins withUser =
+
+  [ angryFlip
+  ]
