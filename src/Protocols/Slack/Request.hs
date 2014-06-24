@@ -1,6 +1,5 @@
 module Protocols.Slack.Request
  ( Request (..)
- , fromPost
  ) where
 
 -- Haskell platform libraries
@@ -9,7 +8,7 @@ import Control.Applicative ((<$>), (<*>))
 
 -- foreign libraries
 
-import Happstack.Server    (RqData, body, look)
+import Happstack.Server (FromData (..), body, look)
 
 data Request = Request { secretToken :: String
                        , channelName :: String
@@ -18,10 +17,10 @@ data Request = Request { secretToken :: String
                        , text        :: String
                        } deriving (Eq, Show)
 
-fromPost :: RqData Request
-fromPost = Request <$> bl "token"
-                      <*> bl "channel_name"
-                      <*> bl "timestamp"
-                      <*> bl "user_name"
-                      <*> bl "text"
-  where bl = body . look
+instance FromData Request where
+  fromData = Request <$> bl "token"
+                     <*> bl "channel_name"
+                     <*> bl "timestamp"
+                     <*> bl "user_name"
+                     <*> bl "text"
+    where bl = body . look

@@ -26,7 +26,7 @@ import           Settings
 
 respond :: ServerPart Response
 respond = do
-    req <- getDataFn Req.fromPost
+    req <- getData
     case req of
       Left errors -> badRequest . toResponse $ unlines errors
       Right m     -> validateToken m
