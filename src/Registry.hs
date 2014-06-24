@@ -1,10 +1,11 @@
-module Registry (plugins) where
+module Registry (pluginsFor) where
 
-import Parser.Commons     (Plugin)
-import Plugins.TableFlip (tableFlip)
+import Text.Parsec.String     (Parser)
+import Text.Parsec.Combinator (choice)
+import Plugins.TableFlip      (tableFlip)
 
-plugins :: String -> [Plugin]
-plugins userName =
+pluginsFor :: String -> Parser String
+pluginsFor userName = choice $
 
   [ tableFlip
   ]

@@ -10,7 +10,6 @@ import Text.Parsec.Prim
 
 -- native libraries
 
-import Registry (plugins)
 import Settings
 
 atBotName :: Parser ()
@@ -18,9 +17,6 @@ atBotName = do
     optional $ char '@'
     string botName
     optional $ char ':'
-
-runPlugins :: String -> Parser String
-runPlugins userName = choice $ plugins userName
 
 withArgs :: String -> Parser String
 withArgs com = do

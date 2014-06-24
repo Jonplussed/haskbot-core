@@ -8,8 +8,8 @@ import qualified Data.Map  as M
 
 -- native libraries
 
+import Parser.Commons (Plugin, commandWithText)
 import Settings
-import Parser.Commons  (Plugin, commandWithText)
 
 -- constants
 

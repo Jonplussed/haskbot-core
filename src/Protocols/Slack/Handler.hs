@@ -2,8 +2,8 @@ module Protocols.Slack.Handler (respond) where
 
 -- Haskell platform libraries
 
-import           Control.Monad.IO.Class    (liftIO)
-import           System.Environment        (getEnv)
+import           Control.Monad.IO.Class (liftIO)
+import           System.Environment     (getEnv)
 import           Text.Parsec.Char
 import           Text.Parsec.Combinator
 import           Text.Parsec.Error
@@ -16,9 +16,10 @@ import           Happstack.Server
 
 -- native libraries
 
-import qualified Protocols.Slack.Request   as Req
-import qualified Protocols.Slack.Response  as Res
-import           Registry                  (plugins)
+import           Parser.Combinators       (atBotName)
+import qualified Protocols.Slack.Request  as Req
+import qualified Protocols.Slack.Response as Res
+import           Registry                 (pluginsFor)
 import           Settings
 
 -- public functions
@@ -49,9 +50,7 @@ applyPlugins :: Req.Request -> Either ParseError String
 applyPlugins req = parse parser str str
   where
     parser = do
-        optional $ char '@'
-        string botName
-        optional $ char ':'
+        atBotName
         spaces
-        choice . plugins $ Req.userName req
+        pluginsFor $ Req.userName req
     str = Req.text req
