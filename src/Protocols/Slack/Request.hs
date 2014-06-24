@@ -4,23 +4,45 @@ module Protocols.Slack.Request
 
 -- Haskell platform libraries
 --
-import Control.Applicative ((<$>), (<*>))
+import           Control.Applicative    ((<$>), (<*>))
+import qualified Control.Monad.IO.Class as IO
+import           System.Environment     (getEnv)
 
 -- foreign libraries
 
-import Happstack.Server (FromData (..), body, look)
+import Happstack.Server (FromData (..), RqData, body, look)
 
-data Request = Request { secretToken :: String
-                       , channelName :: String
-                       , timeStamp   :: String
-                       , userName    :: String
-                       , text        :: String
-                       } deriving (Eq, Show)
+-- native libraries
+
+import Settings (slackTokenEnvVar)
+
+data Request = Unauthorized
+             | Authorized { userName  :: String
+                          , text      :: String
+                          , timeStamp :: String
+                          } deriving (Eq, Show)
+
+instance IO.MonadIO RqData where
+  liftIO = IO.liftIO
 
 instance FromData Request where
-  fromData = Request <$> bl "token"
-                     <*> bl "channel_name"
-                     <*> bl "timestamp"
-                     <*> bl "user_name"
-                     <*> bl "text"
-    where bl = body . look
+  fromData = do
+    can <- isAuthorized
+    if can then newRequest else denyRequest
+
+newRequest :: RqData Request
+newRequest = Authorized <$> bl "user_name"
+                        <*> bl "text"
+                        <*> bl "timestamp"
+
+denyRequest :: RqData Request
+denyRequest = return Unauthorized
+
+isAuthorized :: RqData Bool
+isAuthorized = do
+    yourToken <- bl "token"
+    myToken   <- IO.liftIO $ getEnv slackTokenEnvVar
+    return $ yourToken == myToken
+
+bl :: String -> RqData String
+bl = body . look
