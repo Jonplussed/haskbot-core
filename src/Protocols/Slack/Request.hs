@@ -11,9 +11,13 @@ import System.Environment     (getEnv)
 
 import Web.Scotty             hiding (request)
 
-data Request = Request { username  :: String
-                       , text      :: String
-                       , timestamp :: String
+data Request = Request { teamId      :: String
+                       , channelId   :: String
+                       , channelName :: String
+                       , timestamp   :: String
+                       , userId      :: String
+                       , userName    :: String
+                       , text        :: String
                        } deriving (Eq, Show)
 
 -- constants
@@ -37,6 +41,10 @@ authorize = do
       else fail "unauthorized"
 
 fromParams :: ActionM Request
-fromParams = Request <$> param "username"
-                     <*> param "text"
+fromParams = Request <$> param "team_id"
+                     <*> param "channel_id"
+                     <*> param "channel_name"
                      <*> param "timestamp"
+                     <*> param "user_id"
+                     <*> param "user_name"
+                     <*> param "text"

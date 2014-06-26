@@ -15,7 +15,7 @@ import           Parser.Combinators
 import qualified Protocols.Slack.Request as R
 import           Registry
 
-data Response = Response { username :: String
+data Response = Response { userName :: String
                          , text     :: String
                          } deriving (Eq, Show)
 
@@ -26,7 +26,7 @@ instance ToJSON Response where
 response :: R.Request -> ActionM ()
 response req = do
     case applyPlugins req of
-      Right str -> json $ Response (R.username req) str
+      Right str -> json $ Response (R.userName req) str
       Left err  -> fail "cannot parse"
 
 applyPlugins :: R.Request -> Either ParseError String
@@ -35,5 +35,5 @@ applyPlugins req = parse parser str str
     parser = do
         atBotName
         spaces
-        pluginsFor $ R.username req
+        pluginsFor $ R.userName req
     str = R.text req
