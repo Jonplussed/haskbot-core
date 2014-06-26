@@ -1,11 +1,6 @@
 module Parser.Commons where
 
--- Haskell platform libraries
-
 import Text.Parsec.String (Parser)
-
--- native libraries
-
 import Parser.Combinators (withArgs)
 
 type Plugin  = Parser String
