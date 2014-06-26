@@ -1,28 +1,17 @@
-module Server (server) where
+{-# LANGUAGE OverloadedStrings #-}
 
--- foreign libraries
+module Server
+( server
+) where
 
-import Happstack.Server
-  ( BodyPolicy
-  , decodeBody
-  , defaultBodyPolicy
-  , dir
-  , nullConf
-  , simpleHTTP
-  )
+import           Web.Scotty
 
--- native libraries
-
-import qualified Protocols.Slack.Handler as Slack
+import qualified Protocols.Slack.Request  as Slack
+import qualified Protocols.Slack.Response as Slack
+import           Settings                 (portNum)
 
 -- public functions
 
 server :: IO ()
-server = simpleHTTP nullConf $ do
-  decodeBody bodyPolicy
-  dir "slack" Slack.respond
-
--- private functions
-
-bodyPolicy :: BodyPolicy
-bodyPolicy = defaultBodyPolicy "/tmp/" 0 1000 1000
+server = scotty portNum $ do
+  post "/slack" $ Slack.request >>= Slack.response

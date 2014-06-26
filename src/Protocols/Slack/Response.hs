@@ -1,24 +1,43 @@
+{-# LANGUAGE OverloadedStrings #-}
+
 module Protocols.Slack.Response
-  ( Response (..)
-  ) where
+( response
+) where
 
--- Haskell platform libraries
+import           Text.Parsec.Char
+import           Text.Parsec.Combinator
+import           Text.Parsec.Error
+import           Text.Parsec.Prim
+import           Text.Parsec.String
 
-import qualified Data.ByteString.Char8     as B
-import qualified Data.ByteString.Lazy.UTF8 as LU
-import           Text.Printf ( printf )
+import           Data.Aeson              hiding (json)
+import           Web.Scotty
 
--- foreign libraries
+import           Parser.Combinators
+import           Parser.Commons
+import qualified Protocols.Slack.Request as R
+import           Registry
+import           Settings
 
-import Happstack.Server ( ToMessage (..) )
-
-data Response = Response { userName :: String
+data Response = Response { username :: String
                          , text     :: String
                          } deriving (Eq, Show)
 
-instance ToMessage Response where
-  toContentType _ = B.pack "application/json"
-  toMessage     r = LU.fromString $ json (userName r) (text r)
+instance ToJSON Response where
+  toJSON (Response u t) = object [ "username" .= u
+                                 , "text"     .= t ]
 
-json :: String -> String -> String
-json = printf "{\"username\":\"%s\",\"text\":\"%s\"}"
+response :: R.Request -> ActionM ()
+response req = do
+    case applyPlugins req of
+      Right str -> json $ Response (R.username req) str
+      Left err  -> fail "cannot parse"
+
+applyPlugins :: R.Request -> Either ParseError String
+applyPlugins req = parse parser str str
+  where
+    parser = do
+        atBotName
+        spaces
+        pluginsFor $ R.username req
+    str = R.text req
