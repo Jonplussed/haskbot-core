@@ -11,12 +11,17 @@ import System.Environment     (getEnv)
 
 import Web.Scotty             hiding (request)
 
-import Settings               (slackTokenEnvVar)
-
 data Request = Request { username  :: String
                        , text      :: String
                        , timestamp :: String
                        } deriving (Eq, Show)
+
+-- constants
+
+tokenVar :: String
+tokenVar = "SLACK_TOKEN"
+
+-- public functions
 
 request :: ActionM Request
 request = authorize >> fromParams
@@ -25,7 +30,7 @@ request = authorize >> fromParams
 
 authorize :: ActionM ()
 authorize = do
-    yourToken <- liftIO $ getEnv slackTokenEnvVar
+    yourToken <- liftIO $ getEnv tokenVar
     myToken   <- param "token"
     if myToken == yourToken
       then return ()

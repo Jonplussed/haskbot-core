@@ -1,16 +1,16 @@
 module Parser.Combinators where
 
--- Haskell platform libraries
-
 import Text.Parsec.String
 import Text.Parsec.Char
 import Text.Parsec.Combinator
-import Text.Parsec.Error
 import Text.Parsec.Prim
 
--- native libraries
+-- constants
 
-import Settings
+botName :: String
+botName = "haskbot"
+
+-- public functions
 
 atBotName :: Parser ()
 atBotName = do

@@ -1,15 +1,10 @@
 module Plugins.TableFlip (tableFlip) where
 
--- Haskell platform libraries
+import           Data.Char      (toLower)
+import           Data.List      (foldl')
+import qualified Data.Map       as M
 
-import           Data.Char (toLower)
-import           Data.List (foldl')
-import qualified Data.Map  as M
-
--- native libraries
-
-import Parser.Commons (Plugin, commandWithText)
-import Settings
+import           Parser.Commons (Plugin, commandWithText)
 
 -- constants
 
@@ -37,4 +32,6 @@ flipAnything :: String -> String
 flipAnything "table" = "┻━┻"
 flipAnything str = foldl' flipLet "" str
   where
-    flipLet s l = M.findWithDefault l (toLower l) charMap : s
+    flipLet s l = M.findWithDefault l' l' charMap : s
+      where
+        l' = toLower l

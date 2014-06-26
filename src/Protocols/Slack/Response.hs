@@ -5,19 +5,15 @@ module Protocols.Slack.Response
 ) where
 
 import           Text.Parsec.Char
-import           Text.Parsec.Combinator
 import           Text.Parsec.Error
 import           Text.Parsec.Prim
-import           Text.Parsec.String
 
 import           Data.Aeson              hiding (json)
 import           Web.Scotty
 
 import           Parser.Combinators
-import           Parser.Commons
 import qualified Protocols.Slack.Request as R
 import           Registry
-import           Settings
 
 data Response = Response { username :: String
                          , text     :: String
