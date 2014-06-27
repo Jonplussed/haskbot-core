@@ -4,6 +4,7 @@ module Main
 ( main
 ) where
 
+import           System.Environment       (getEnv)
 import           Web.Scotty
 
 import qualified Protocols.Slack.Request  as Slack
@@ -11,11 +12,16 @@ import qualified Protocols.Slack.Response as Slack
 
 -- constants
 
-port :: Int
-port = 8000
+portVar :: String
+portVar = "PORT"
 
 -- public functions
 
 main :: IO ()
-main = scotty port $ do
-  post "/slack" $ Slack.request >>= Slack.response
+main = getEnv portVar >>= runServerOn . read
+
+-- private functions
+
+runServerOn :: Int -> IO ()
+runServerOn port = scotty port $ do
+    post "/slack" $ Slack.request >>= Slack.response
