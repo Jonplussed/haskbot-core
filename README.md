@@ -33,15 +33,18 @@ this means your package manager probably provides it for you.
 
 1. Run the following to install the platform:
    - On Ubuntu
+
      ```sh
      sudo apt-get update
      sudo apt-get install haskell-platform
      ```
    - On OXS
+
      ```sh
      brew update
      brew install haskell-platform
      ```
+     
 2. Add Cabal's (the Haskell package manager) `bin` folder to your shell's
    `$PATH`. This is usually done by adding the following lines to
    `~/.profile` or `~/.bash_profile` (whichever you have/prefer).
@@ -54,6 +57,7 @@ this means your package manager probably provides it for you.
    source ~/.profile
    ```
 3. Update the Haskell packages via:
+
    ```sh
    cabal update
    cabal install cabal-install
@@ -65,25 +69,33 @@ Once you have the platform, setting up a development environment is a breeze
 (but it does take a few minutes while everything compiles).
 
 1. Clone this repository into the directory of your choice via:
+
    ```sh
    git clone https://github.com/Jonplussed/Haskbot.git
    ```
+
 2. Install any required dependencies via:
+
    ```sh
    cd [your Haskbot directory]
    cabal sandbox init
    cabal install --only-dependencies
    ```
+
 3. Build, baby, build!
+
    ```sh
    cabal build
    ```
+
 4. Run the server with the required environmental variables:
+
    ```sh
    SLACK_TOKEN=[you'll need to get this] \
    PORT=[your port of choice] \
    ./dist/build/Haskbot/Haskbot
    ```
+
 8. Test that the Haskbot server is running by pinging
    `http://localhost:[your port from above]`.
 
@@ -114,14 +126,14 @@ Adding a plugin for Haskbot is simple process:
          , ("second input string",  "second expected output string")
          ]
    ```
-  Of course, any plugins with side effects (such as setting a Redis key/value)
-  will require additional, more complicated specs.
+   Of course, any plugins with side effects (such as setting a Redis key/value)
+   will require additional, more complicated specs.
 
-  To run specs, from your project root, run:
-  ```sh
-  cabal build spec && ./dist/build/spec/spec
-  ```
-  to rebuild the project and see the HSpec output.
+   To run specs, from your project root, run:
+   ```sh
+   cabal build spec && ./dist/build/spec/spec
+   ```
+   to rebuild the project and see the HSpec output.
 
 3. **Write your plugin**
 
