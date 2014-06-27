@@ -26,7 +26,7 @@ source-repository     head
 executable            haskbot
   hs-source-dirs:     src
   main-is:            Main.hs
-  build-depends:      base >= 4.6,
+  build-depends:      base >= 4.6 && < 4.7,
                       containers >= 0.5,
                       transformers >= 0.3,
                       parsec >= 3.1,
@@ -37,7 +37,7 @@ executable            haskbot
 test-suite            spec
   hs-source-dirs:     src, test
   main-is:            Spec.hs
-  build-depends:      base >= 4.6,
+  build-depends:      base >= 4.6 && < 4.7,
                       hspec >= 1.8,
                       containers >= 0.5,
                       transformers >= 0.3,
