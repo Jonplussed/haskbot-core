@@ -11,7 +11,7 @@ The purpose of this little bot is to provide:
 Because this application is designed for beginners, setup will begin with
 bootstrapping a Haskell development environment. If you already know the
 basics, feel free to skip to [bootstrapping](#bootstrapping) or
-[creating-a-plugin](#creating-a-plugin).
+[creating plugins](#creating-plugins).
 
 ### New to Haskell?
 
@@ -59,7 +59,7 @@ this means your package manager probably provides it for you.
    cabal install cabal-install
    ```
 
-### Bootstrapping a Haskbot development environment
+### Bootstrapping a Haskbot Development Environment
 
 Once you have the platform, setting up a development environment is a breeze
 (but it does take a few minutes while everything compiles).
@@ -87,7 +87,7 @@ Once you have the platform, setting up a development environment is a breeze
 8. Test that the Haskbot server is running by pinging
    `http://localhost:[your port from above]`.
 
-### Creating Plugins
+## Creating Plugins
 
 Plugins for Haskbot are simply functions that parse an input string and return
 an output string (and perhaps do something side-effecty on the server).
@@ -152,7 +152,9 @@ Adding a plugin for Haskbot is simple process:
    me a pull request, I'll ensure your plugin tested, and I'll redeploy
    Haskbot with new functionality included!
 
-### More
+## More
+
+### Supporting Additional Chat Protocols
 
 Haskbot currently supports only [Slack](https://api.slack.com/), but
 additional protocols can be added in the `src/Protocols/` directory. Each
