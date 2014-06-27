@@ -14,6 +14,7 @@ import           Web.Scotty
 import           Parser.Combinators
 import qualified Protocols.Slack.Request as R
 import           Registry
+import           Types.User              (getUser)
 
 data Response = Response { userName :: String
                          , text     :: String
@@ -35,5 +36,5 @@ applyPlugins req = parse parser str str
     parser = do
         atBotName
         spaces
-        pluginsFor $ R.userName req
+        pluginsFor $ getUser req
     str = R.text req

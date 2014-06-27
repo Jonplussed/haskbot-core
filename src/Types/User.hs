@@ -3,6 +3,7 @@ module Types.User
 , UUID (..)
 , User (..)
 , HasUser (..)
+, fromStrings
 ) where
 
 newtype UserName = UserName { getUserName :: String
@@ -11,8 +12,8 @@ newtype UserName = UserName { getUserName :: String
 newtype UUID = UUID { getUUID :: String
                     } deriving (Eq, Show)
 
-data User = User { userName :: UserName
-                 , uniqueId :: UUID
+data User = User { uniqueId :: UUID
+                 , userName :: UserName
                  } deriving (Eq, Show)
 
 class HasUser a where
@@ -20,3 +21,6 @@ class HasUser a where
 
 instance HasUser User where
   getUser user = user
+
+fromStrings :: String -> String -> User
+fromStrings uuid name = User (UUID uuid) (UserName name)

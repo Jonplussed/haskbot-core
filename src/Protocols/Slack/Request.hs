@@ -8,8 +8,9 @@ module Protocols.Slack.Request
 import Control.Applicative    ((<$>), (<*>))
 import Control.Monad.IO.Class (liftIO)
 import System.Environment     (getEnv)
-
 import Web.Scotty             hiding (request)
+
+import Types.User             (HasUser (getUser), fromStrings)
 
 data Request = Request { teamId      :: String
                        , channelId   :: String
@@ -19,6 +20,9 @@ data Request = Request { teamId      :: String
                        , userName    :: String
                        , text        :: String
                        } deriving (Eq, Show)
+
+instance HasUser Request where
+  getUser req = fromStrings (userId req) (userName req)
 
 -- constants
 

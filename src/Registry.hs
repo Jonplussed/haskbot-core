@@ -4,9 +4,10 @@ import Text.Parsec.String     (Parser)
 import Text.Parsec.Combinator (choice)
 
 import Plugins.TableFlip      (tableFlip)
+import Types.User             (User)
 
-pluginsFor :: String -> Parser String
-pluginsFor userName = choice $
+pluginsFor :: User -> Parser String
+pluginsFor user = choice $
 
   [ tableFlip
   ]
