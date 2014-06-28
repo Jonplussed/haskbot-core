@@ -1,4 +1,7 @@
-module Parser.Combinators where
+module Parser.Combinator
+( atBotName
+, withArgs
+) where
 
 import Text.Parsec.String
 import Text.Parsec.Char

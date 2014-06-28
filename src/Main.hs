@@ -4,11 +4,11 @@ module Main
 ( main
 ) where
 
-import           System.Environment       (getEnv)
+import           System.Environment      (getEnv)
 import           Web.Scotty
 
-import qualified Protocols.Slack.Request  as Slack
-import qualified Protocols.Slack.Response as Slack
+import qualified Protocol.Slack.Request  as Slack
+import qualified Protocol.Slack.Response as Slack
 
 -- constants
 

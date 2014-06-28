@@ -6,8 +6,9 @@ import           Data.Char      (toLower)
 import           Data.List      (foldl')
 import qualified Data.Map       as M
 
-import           Parser.Commons (Plugin, Name, HelpText, InputParser,
-                                 newPlugin, commandWithText)
+import           Parser.Common  (commandWithText)
+import           Type.Plugin    (Plugin, Name, HelpText, InputParser,
+                                 newPlugin)
 
 -- constants
 

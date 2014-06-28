@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Protocols.Slack.Request
+module Protocol.Slack.Request
 ( Request (..)
 , request
 ) where
@@ -10,7 +10,7 @@ import Control.Monad.IO.Class (liftIO)
 import System.Environment     (getEnv)
 import Web.Scotty             hiding (request)
 
-import Types.User             (HasUser (getUser), fromStrings)
+import Type.User              (HasUser (getUser), fromStrings)
 
 data Request = Request { teamId      :: String
                        , channelId   :: String

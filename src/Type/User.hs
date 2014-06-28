@@ -1,4 +1,4 @@
-module Types.User
+module Type.User
 ( UserName (..)
 , UUID (..)
 , User (..)

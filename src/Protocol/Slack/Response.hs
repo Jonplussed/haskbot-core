@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Protocols.Slack.Response
+module Protocol.Slack.Response
 ( response
 ) where
 
@@ -8,13 +8,13 @@ import           Text.Parsec.Char
 import           Text.Parsec.Error
 import           Text.Parsec.Prim
 
-import           Data.Aeson              hiding (json)
+import           Data.Aeson             hiding (json)
 import           Web.Scotty
 
-import           Parser.Combinators
-import qualified Protocols.Slack.Request as R
-import           Registry
-import           Types.User              (getUser)
+import           Parser.Combinator      (atBotName)
+import           Parser.Plugin          (pluginsFor)
+import qualified Protocol.Slack.Request as R
+import           Type.User              (getUser)
 
 data Response = Response { userName :: String
                          , text     :: String

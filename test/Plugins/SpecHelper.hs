@@ -6,7 +6,7 @@ import Text.Parsec.Error (ParseError)
 
 import Test.Hspec
 
-import Parser.Commons   (Plugin, plParser)
+import Type.Plugin       (Plugin, plParser)
 
 type Input  = String
 type Output = String

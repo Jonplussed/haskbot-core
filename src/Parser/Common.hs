@@ -1,40 +1,14 @@
-module Parser.Commons
-( Plugin (..)
-, Name
-, HelpText
-, InputParser
-, newPlugin
-, commandWithArgs
+module Parser.Common
+( commandWithArgs
 , commandWithText
 ) where
 
-import Data.Text (Text)
+import Parser.Combinator (withArgs)
+import Type.Plugin       (InputParser)
 
-import Text.Parsec.String (Parser)
-import Parser.Combinators (withArgs)
-
-type Name        = String
-type Command     = String
-type HelpText    = Text
-type InputParser = Parser String
-
-data Plugin = Plugin { plName     :: Name
-                     , plHelpText :: HelpText
-                     , plParser   :: InputParser
-                     }
+type Command = String
 
 -- public functions
-
-newPlugin
-  -- the arbitrary name of your plugin
-  :: Name
-  -- the help text displayed by the "help" command
-  -> HelpText
-  -- the parser that consuming the input text
-  -> InputParser
-  -- creates the full plugin
-  -> Plugin
-newPlugin = Plugin
 
 commandWithArgs
   -- the first word of the message text, identifying the command
