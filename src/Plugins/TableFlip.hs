@@ -1,12 +1,22 @@
-module Plugins.TableFlip (tableFlip) where
+{-# LANGUAGE OverloadedStrings #-}
+
+module Plugins.TableFlip (plugin) where
 
 import           Data.Char      (toLower)
 import           Data.List      (foldl')
 import qualified Data.Map       as M
 
-import           Parser.Commons (Plugin, commandWithText)
+import           Parser.Commons (Plugin, Name, HelpText, InputParser,
+                                 newPlugin, commandWithText)
 
 -- constants
+
+name :: Name
+name = "flip"
+
+helpText :: HelpText
+helpText = "Displeased with something? Type \"haskbot flip [any other text]\"\
+           \ to have Haskbot cathartically toss what ails you."
 
 flippedLets, uprightLets :: String
 uprightLets = "abcdefghijklmnopqrstuvwxyz.!?()[]<>"
@@ -14,10 +24,13 @@ flippedLets = "ɐqɔpǝɟƃɥᴉɾʞlɯuodbɹsʇnʌʍxʎz˙¡¿)(][><"
 
 -- public functions
 
-tableFlip :: Plugin
-tableFlip = commandWithText "flip" output
+plugin :: Plugin
+plugin = newPlugin name helpText parser
 
 -- private functions
+
+parser :: InputParser
+parser = commandWithText "flip" output
 
 charMap :: M.Map Char Char
 charMap = M.fromList $ zip (u ++ f) (f ++ u)

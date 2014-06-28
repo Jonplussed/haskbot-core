@@ -6,7 +6,7 @@ import Text.Parsec.Error (ParseError)
 
 import Test.Hspec
 
-import Parser.Commons   (Plugin)
+import Parser.Commons   (Plugin, plParser)
 
 type Input  = String
 type Output = String
@@ -22,4 +22,4 @@ responsesFor :: Plugin -> [(Input, Output)] -> Spec
 responsesFor plugin resps = do
   forM_ resps $ \(input, output) ->
     it ("correctly responds to \"" ++ input ++ "\"") $ do
-      parse plugin input input `shouldBe` Right output
+      parse (plParser plugin) input input `shouldBe` Right output

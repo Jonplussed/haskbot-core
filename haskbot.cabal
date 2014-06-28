@@ -26,25 +26,27 @@ source-repository     head
 executable            haskbot
   hs-source-dirs:     src
   main-is:            Main.hs
-  build-depends:      base >= 4.6 && < 4.7,
-                      containers >= 0.5,
+  build-depends:      containers >= 0.5,
+                      text >= 0.11,
                       transformers >= 0.3,
                       parsec >= 3.1,
                       aeson >= 0.6,
                       scotty >= 0.8,
-                      hedis >= 0.6.5
+                      hedis >= 0.6.5,
+                      base >= 4.6 && < 4.7
   default-language:   Haskell2010
 
 test-suite            spec
   hs-source-dirs:     src, test
   main-is:            Spec.hs
-  build-depends:      base >= 4.6 && < 4.7,
-                      hspec >= 1.8,
+  build-depends:      hspec >= 1.8,
                       containers >= 0.5,
+                      text >= 0.11,
                       transformers >= 0.3,
                       parsec >= 3.1,
                       aeson >= 0.6,
                       scotty >= 0.8,
-                      hedis >= 0.6.5
+                      hedis >= 0.6.5,
+                      base >= 4.6 && < 4.7
   type:               exitcode-stdio-1.0
   default-language:   Haskell2010

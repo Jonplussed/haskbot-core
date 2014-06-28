@@ -1,13 +1,17 @@
 module Registry (pluginsFor) where
 
-import Text.Parsec.String     (Parser)
-import Text.Parsec.Combinator (choice)
+import Text.Parsec.String          (Parser)
+import Text.Parsec.Combinator      (choice)
 
-import Plugins.TableFlip      (tableFlip)
-import Types.User             (User)
+import Parser.Commons              (Plugin, plParser)
+import qualified Plugins.TableFlip as Flip
+import Types.User                  (User)
+
+registry :: User -> [Plugin]
+registry user =
+
+  [ Flip.plugin
+  ]
 
 pluginsFor :: User -> Parser String
-pluginsFor user = choice $
-
-  [ tableFlip
-  ]
+pluginsFor = choice . map plParser . registry
