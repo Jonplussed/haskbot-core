@@ -21,8 +21,9 @@ data Response = Response { userName :: String
                          } deriving (Eq, Show)
 
 instance ToJSON Response where
-  toJSON (Response u t) = object [ "username" .= u
-                                 , "text"     .= t ]
+  -- we leave off the optional username in the Slack response parameters
+  -- because all it does is replace Haskbot's name, not send a DM
+  toJSON (Response u t) = object [ "text" .= t ]
 
 response :: R.Request -> ActionM ()
 response req = do
