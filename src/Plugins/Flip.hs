@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Plugins.TableFlip (plugin) where
+module Plugins.Flip (plugin) where
 
 import           Data.Char      (toLower)
 import           Data.List      (foldl')
@@ -16,7 +16,7 @@ name :: Name
 name = "flip"
 
 helpText :: HelpText
-helpText = "Displeased with something? Type \"haskbot flip [any other text]\"\
+helpText = "Displeased with something? Type `haskbot flip [any other text]`\
            \ to have Haskbot cathartically toss what ails you."
 
 flippedLets, uprightLets :: String

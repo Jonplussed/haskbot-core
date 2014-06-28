@@ -1,8 +1,8 @@
-module Plugins.TableFlipSpec (spec) where
+module Plugins.FlipSpec (spec) where
 
 import Test.Hspec
 
-import Plugins.TableFlip  (plugin)
+import Plugins.Flip  (plugin)
 import Plugins.SpecHelper (responsesFor)
 
 main :: IO ()
