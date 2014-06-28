@@ -11,5 +11,5 @@ registry :: User -> [Plugin]
 registry user =
 
   [ Flip.plugin
-  , Help.plugin
+  , Help.pluginFor user
   ]
