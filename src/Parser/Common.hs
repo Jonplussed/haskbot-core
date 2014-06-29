@@ -3,7 +3,7 @@ module Parser.Common
 , commandWithText
 ) where
 
-import Parser.Combinator (withArgs)
+import Parser.Combinator (withArgs, withOptionalArgs)
 import Type.Plugin       (InputParser)
 
 type Command = String
@@ -20,6 +20,9 @@ commandWithArgs
   -> InputParser
 commandWithArgs com fn = withArgs com >>= return . fn . words
 
+commandWithOptionalArgs :: Command -> ([String] -> String) -> InputParser
+commandWithOptionalArgs com fn = withOptionalArgs com >>= return . fn . words
+
 commandWithText
   -- the first word of the message text, identifying the command
   :: Command
@@ -29,3 +32,6 @@ commandWithText
   -- creates your parser for you!
   -> InputParser
 commandWithText com fn = withArgs com >>= return . fn
+
+commandWithOptionalText :: Command -> (String -> String) -> InputParser
+commandWithOptionalText com fn = withOptionalArgs com >>= return . fn

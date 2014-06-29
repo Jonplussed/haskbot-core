@@ -1,6 +1,7 @@
 module Parser.Combinator
 ( atBotName
 , withArgs
+, withOptionalArgs
 ) where
 
 import Text.Parsec.String
@@ -25,3 +26,9 @@ withArgs :: String -> Parser String
 withArgs com = do
     try $ string com
     option "" .  try $ space >> manyTill anyChar eof
+
+withOptionalArgs :: String -> Parser String
+withOptionalArgs com = do
+    try $ string com
+    space
+    manyTill anyChar eof
