@@ -1,6 +1,6 @@
 module Registry (registry) where
 
-import           Type.Plugin  (Plugin, plParser)
+import           Type.Plugin  (Plugin)
 import           Type.User    (User)
 import qualified Plugins.Flip as Flip
 
