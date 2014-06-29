@@ -4,8 +4,8 @@ import Text.Parsec.String     (Parser)
 import Text.Parsec.Combinator (choice)
 
 import Registry               (registry)
-import Type.Plugin            (plParser)
+import Type.Plugin            (runPlugin)
 import Type.User              (User)
 
 pluginsFor :: User -> Parser String
-pluginsFor = choice . map plParser . registry
+pluginsFor = choice . map runPlugin . registry

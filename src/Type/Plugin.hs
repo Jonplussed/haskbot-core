@@ -1,13 +1,16 @@
 module Type.Plugin
-( Plugin (..)
+( Plugin (plName, plHelpText)
 , Name
 , HelpText
 , InputParser
 , newPlugin
+, runPlugin
 ) where
 
-import Data.Text (Text)
+import Data.Text          (Text)
 import Text.Parsec.String (Parser)
+import Text.Parsec.Char   (string)
+import Text.Parsec.Prim   (try)
 
 type Name        = String
 type HelpText    = Text
@@ -18,13 +21,10 @@ data Plugin = Plugin { plName     :: Name
                      , plParser   :: InputParser
                      }
 
-newPlugin
-  -- the arbitrary name of your plugin
-  :: Name
-  -- the help text displayed by the "help" command
-  -> HelpText
-  -- the parser that consuming the input text
-  -> InputParser
-  -- creates the full plugin
-  -> Plugin
+newPlugin :: Name -> HelpText -> InputParser -> Plugin
 newPlugin = Plugin
+
+runPlugin :: Plugin -> Parser String
+runPlugin p = do
+    try . string $ plName p
+    plParser p

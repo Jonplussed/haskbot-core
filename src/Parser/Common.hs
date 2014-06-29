@@ -1,37 +1,21 @@
 module Parser.Common
-( commandWithArgs
-, commandWithText
+( withArgs
+, withOptArgs
+, withText
 ) where
 
-import Parser.Combinator (withArgs, withOptionalArgs)
+import Parser.Combinator (text, args, optArgs)
 import Type.Plugin       (InputParser)
 
 type Command = String
 
 -- public functions
 
-commandWithArgs
-  -- the first word of the message text, identifying the command
-  :: Command
-  -- a function taking the rest of the message words as a list of arguments
-  -- and returning a new string
-  -> ([String] -> String)
-  -- creates your parser for you!
-  -> InputParser
-commandWithArgs com fn = withArgs com >>= return . fn . words
+withArgs :: ([String] -> String) -> InputParser
+withArgs fn = args >>= return . fn
 
-commandWithOptionalArgs :: Command -> ([String] -> String) -> InputParser
-commandWithOptionalArgs com fn = withOptionalArgs com >>= return . fn . words
+withOptArgs :: ([String] -> String) -> InputParser
+withOptArgs fn = optArgs >>= return . fn
 
-commandWithText
-  -- the first word of the message text, identifying the command
-  :: Command
-  -- a function taking the rest of the message as a string of text
-  -- and returning a new string
-  -> (String -> String)
-  -- creates your parser for you!
-  -> InputParser
-commandWithText com fn = withArgs com >>= return . fn
-
-commandWithOptionalText :: Command -> (String -> String) -> InputParser
-commandWithOptionalText com fn = withOptionalArgs com >>= return . fn
+withText :: (String -> String) -> InputParser
+withText fn = text >>= return . fn

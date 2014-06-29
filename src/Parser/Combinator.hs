@@ -1,7 +1,8 @@
 module Parser.Combinator
-( atBotName
-, withArgs
-, withOptionalArgs
+( botName
+, text
+, args
+, optArgs
 ) where
 
 import Text.Parsec.String
@@ -9,26 +10,31 @@ import Text.Parsec.Char
 import Text.Parsec.Combinator
 import Text.Parsec.Prim
 
--- constants
-
-botName :: String
-botName = "haskbot"
-
 -- public functions
 
-atBotName :: Parser ()
-atBotName = do
-    optional $ char '@'
-    string botName
-    optional $ char ':'
+botName :: Parser String
+botName = string "haskbot"
 
-withArgs :: String -> Parser String
-withArgs com = do
-    try $ string com
-    option "" .  try $ space >> manyTill anyChar eof
+text :: Parser String
+text = space >> many1Till anyChar eof
 
-withOptionalArgs :: String -> Parser String
-withOptionalArgs com = do
-    try $ string com
-    space
-    manyTill anyChar eof
+args :: Parser [String]
+args = text >>= return . words
+
+optArgs :: Parser [String]
+optArgs = optText >>= return . words
+
+-- private functions
+
+optText :: Parser String
+optText = option "" $ try text
+
+many1Till :: (Show end, Stream s m t)
+          => ParsecT s u m a
+          -> ParsecT s u m end
+          -> ParsecT s u m [a]
+many1Till p end = do
+    notFollowedBy end
+    first <- p
+    rest  <- manyTill p end
+    return $ first : rest
