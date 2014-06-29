@@ -1,6 +1,9 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Plugins.Help (pluginFor) where
+module Plugins.Help
+( listAllText
+, pluginFor
+) where
 
 import Data.List     (find, intercalate)
 import Data.Text     (unpack)

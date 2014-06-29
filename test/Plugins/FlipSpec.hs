@@ -11,7 +11,7 @@ main = hspec spec
 
 spec :: Spec
 spec = do
-  describe "tableFlip" $ do
+  describe "flip plugin" $ do
     context "with any input text" $ do
       testPluginResponses plugin
         [ ("flip table",     "(╯°□°）╯︵ ┻━┻")
