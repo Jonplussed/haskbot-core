@@ -23,5 +23,5 @@ atBotName = do
 
 withArgs :: String -> Parser String
 withArgs com = do
-    try $ string com >> space
-    manyTill anyChar eof
+    try $ string com
+    option "" .  try $ space >> manyTill anyChar eof
