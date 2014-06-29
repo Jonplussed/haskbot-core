@@ -16,10 +16,10 @@ spec = do
       testPluginResponses plugin
         [ ("flip table",     "(╯°□°）╯︵ ┻━┻")
         , ("flip foo bar!",  "(╯°□°）╯︵ ¡ɹɐq ooɟ")
-        , ("flip ",          "(╯°□°）╯︵ ")
         ]
 
     context "without any input text" $ do
       it "should fail" $ do
+        shouldFail $ withPlugin plugin "flip "
         shouldFail $ withPlugin plugin "flip"
 

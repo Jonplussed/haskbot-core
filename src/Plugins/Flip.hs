@@ -6,7 +6,7 @@ import           Data.Char      (toLower)
 import           Data.List      (foldl')
 import qualified Data.Map       as M
 
-import           Parser.Common  (commandWithText)
+import           Parser.Common  (withText)
 import           Type.Plugin    (Plugin, Name, HelpText, InputParser,
                                  newPlugin)
 
@@ -31,7 +31,7 @@ plugin = newPlugin name helpText parser
 -- private functions
 
 parser :: InputParser
-parser = commandWithText "flip" output
+parser = withText genOutput
 
 charMap :: M.Map Char Char
 charMap = M.fromList $ zip (u ++ f) (f ++ u)
@@ -39,12 +39,12 @@ charMap = M.fromList $ zip (u ++ f) (f ++ u)
     u = uprightLets
     f = flippedLets
 
-output :: String -> String
-output str = "(╯°□°）╯︵ " ++ flipAnything str
+genOutput :: String -> String
+genOutput str = "(╯°□°）╯︵ " ++ flipChars str
 
-flipAnything :: String -> String
-flipAnything "table" = "┻━┻"
-flipAnything str = foldl' flipLet "" str
+flipChars :: String -> String
+flipChars "table" = "┻━┻"
+flipChars str = foldl' flipLet "" str
   where
     flipLet s l = M.findWithDefault l' l' charMap : s
       where

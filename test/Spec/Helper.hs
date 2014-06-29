@@ -10,7 +10,7 @@ import Text.Parsec.Error (ParseError)
 import Test.Hspec
 
 import Spec.Expectation  (TestParser, shouldOutput)
-import Type.Plugin       (Plugin, plParser)
+import Type.Plugin       (Plugin, runPlugin)
 
 type Input  = String
 type Output = String
@@ -22,4 +22,4 @@ testPluginResponses plugin resps = do
       withPlugin plugin input `shouldOutput` output
 
 withPlugin :: Plugin -> String -> TestParser String
-withPlugin plugin input = parse (plParser plugin) input input
+withPlugin plugin input = parse (runPlugin plugin) input input
