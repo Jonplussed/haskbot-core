@@ -5,7 +5,7 @@ module Plugins.Help (pluginFor) where
 import Data.List     (find, intercalate)
 import Data.Text     (unpack)
 
-import Parser.Common (commandWithText)
+import Parser.Common (withOptArgs)
 import Registry      (registry)
 import Type.Plugin   (Plugin, Name, HelpText, InputParser, plName,
                       plHelpText, newPlugin)
@@ -29,7 +29,7 @@ pluginFor = newPlugin name helpText . parserFor
 -- private functions
 
 parserFor :: User -> InputParser
-parserFor = commandWithText "help" . getHelpFor
+parserFor = withOptArgs . getHelpFor
 
 listAllText :: User -> String
 listAllText user =
@@ -39,10 +39,11 @@ listAllText user =
     listFor        = intercalate ", " . map plName' . registry
     plName' plugin = "`" ++ plName plugin ++ "`"
 
-getHelpFor :: User -> String -> String
-getHelpFor user com =
+getHelpFor :: User -> [String] -> String
+getHelpFor user []       = listAllText user
+getHelpFor user (a:args) =
   case plugin of
     Just p  -> unpack $ plHelpText p
     Nothing -> listAllText user
   where
-    plugin = find (\p -> plName p == com) $ registry user
+    plugin = find (\p -> plName p == a) $ registry user
