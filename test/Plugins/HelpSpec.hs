@@ -1,4 +1,4 @@
-module Plugins.HelpSpec (spec) where
+module Plugins.HelpSpec (main, spec) where
 
 import Data.Text        (unpack)
 

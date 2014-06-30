@@ -1,4 +1,4 @@
-module Plugins.FlipSpec (spec) where
+module Plugins.FlipSpec (main, spec) where
 
 import Test.Hspec
 
