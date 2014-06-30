@@ -14,8 +14,6 @@ main = hspec spec
 spec :: Spec
 spec = do
 
-  let parseWith parser string = P.parse parser string string
-
   describe "parser combinators" $ do
     describe "botName" $ do
 

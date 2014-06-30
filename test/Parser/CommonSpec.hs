@@ -14,8 +14,6 @@ main = hspec spec
 spec :: Spec
 spec = do
 
-  let parseWith parser input = P.parse parser input input
-
   describe "withArgs" $ do
 
     let parse = parseWith $ withArgs concat
