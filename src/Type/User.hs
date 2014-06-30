@@ -12,7 +12,7 @@ newtype UserName = UserName { getUserName :: String
 newtype UUID = UUID { getUUID :: String
                     } deriving (Eq, Show)
 
-data User = User { uniqueId :: UUID
+data User = User { uniqueID :: UUID
                  , userName :: UserName
                  } deriving (Eq, Show)
 
