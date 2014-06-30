@@ -38,13 +38,13 @@ this means your package manager probably provides it for you.
      sudo apt-get update
      sudo apt-get install haskell-platform
      ```
-   - On OXS
+   - On OSX
 
      ```sh
      brew update
      brew install haskell-platform
      ```
-     
+
 2. Add Cabal's (the Haskell package manager) `bin` folder to your shell's
    `$PATH`. This is usually done by adding the following lines to
    `~/.profile` or `~/.bash_profile` (whichever you have/prefer).
@@ -101,8 +101,8 @@ Once you have the platform, setting up a development environment is a breeze
 
 ## Creating Plugins
 
-Plugins for Haskbot are simply functions that parse an input string and return
-an output string (and perhaps do something side-effecty on the server).
+Plugins for Haskbot are at heart functions that parse an input string and
+return an output string (and perhaps do something side-effecty on the server).
 Adding a plugin for Haskbot is simple process:
 
 1. **Add the requisite files**
@@ -137,31 +137,51 @@ Adding a plugin for Haskbot is simple process:
 
 3. **Write your plugin**
 
-   Plugins are simply functions that parse an input string, maybe do something
-   side-effecty, and return an output string. `Text.Parsec` is directly
-   available for the more experienced Haskellers; for the newer, some
-   prefabricated parsers can be found in the `Parser.Commons` module.
+   Plugins require three things: a name, some help text describing how to use
+   the plugin, and the plugin function that parses an input string, maybe does
+   something side-effecty, and returns an output string.
 
-   **Example:** A plugin that takes the first word as a command and the rest of
-   the text as the only argument can then be written as:
+   To write the function, the `Parser.Commons` module contains prefabricated
+   parsers for the most common chatbot uses. For more advanced functionality,
+   the famous `Text.Parsec` parser modules are available.
+
+   **Example:** a plugin called _foobar_ which is invoked via `haskbot foobar
+   [any text after]` can be written in entirety as:
+
    ```haskell
-   myPluginName :: Plugin
-   myPluginName = commandWithText "trigger" someOutput
+   {-# LANGUAGE OverloadedStrings #-}
 
-   someOutput :: String -> String
-   someOutput = ... -- function body goes here
+   module Plugins.Foobar (plugin) where
+
+   import Parser.Common
+   import Type.Plugin
+
+   plugin :: Plugin
+   plugin = newPlugin name helpText parser
+
+   name :: Name
+   name = "foobar"
+
+   helpText :: HelpText
+   helpText = "this is how to use `haskbot foobar`"
+
+   parser :: InputParser
+   parser = withText doSomething
+
+   doSomething :: String -> String
+   doSomething = ... -- function body goes here
    ```
 
 4. **Register your plugin**
 
    To include your plugin in those run by Haskbot, import your plugin module in
-   the `Registry` module and add your plugin function to the list in the
-   `pluginsFor` function.
+   the `Registry` module and add your plugin to the list in the `registry`
+   function.
 
 5. **Send a pull request**
 
    I'll take care of compiling and deploying the updated Haskbot. Send me a
-   me a pull request, I'll ensure your plugin tested, and I'll redeploy
+   me a pull request, I'll ensure your plugin is tested, and I'll redeploy
    Haskbot with new functionality included!
 
 ## More
