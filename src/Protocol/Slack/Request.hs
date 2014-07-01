@@ -27,7 +27,7 @@ instance HasUser Request where
 -- constants
 
 tokenVar :: String
-tokenVar = "SLACK_TOKEN"
+tokenVar = "SLACK_OUTGOING_TOKEN"
 
 -- public functions
 
