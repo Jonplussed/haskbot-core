@@ -26,6 +26,6 @@ main = getArgs >>= runApp
 -- private functions
 
 runApp :: [String] -> IO ()
-runApp ["serve", port] = webServer $ read port
-runApp ["task",  task] = taskRunner task
-runApp _               = error usage
+runApp ["serve",port] = webServer $ read port
+runApp ("task":tasks) = taskRunner tasks
+runApp _              = error usage
