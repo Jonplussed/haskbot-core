@@ -1,27 +1,31 @@
-{-# LANGUAGE OverloadedStrings #-}
-
 module Main
 ( main
 ) where
 
-import           System.Environment      (getEnv)
-import           Web.Scotty
+import System.Environment (getArgs)
 
-import qualified Protocol.Slack.Request  as Slack
-import qualified Protocol.Slack.Response as Slack
+import Application.TaskRunner (taskRunner)
+import Application.WebServer (webServer)
 
 -- constants
 
-portVar :: String
-portVar = "PORT"
+usage :: String
+usage = unlines
+  [ "a haskell-based chatbot"
+  , ""
+  , "USAGE:"
+  , "haskbot serve PORT - run as webserver listening on the specified PORT"
+  , "haskbot task NAME  - run a one-off task of the given NAME"
+  ]
 
 -- public functions
 
 main :: IO ()
-main = getEnv portVar >>= runServerOn . read
+main = getArgs >>= runApp
 
 -- private functions
 
-runServerOn :: Int -> IO ()
-runServerOn port = scotty port $ do
-    post "/slack" $ Slack.request >>= Slack.response
+runApp :: [String] -> IO ()
+runApp ["serve", port] = webServer $ read port
+runApp ["task",  task] = taskRunner task
+runApp _               = error usage
