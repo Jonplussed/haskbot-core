@@ -11,11 +11,11 @@ type Command = String
 
 -- public functions
 
-withArgs :: ([String] -> String) -> InputParser
+withArgs :: ([String] -> IO String) -> InputParser
 withArgs fn = args >>= return . fn
 
-withOptArgs :: ([String] -> String) -> InputParser
+withOptArgs :: ([String] -> IO String) -> InputParser
 withOptArgs fn = optArgs >>= return . fn
 
-withText :: (String -> String) -> InputParser
+withText :: (String -> IO String) -> InputParser
 withText fn = text >>= return . fn

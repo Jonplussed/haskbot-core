@@ -31,7 +31,7 @@ plugin = newPlugin name helpText parser
 -- private functions
 
 parser :: InputParser
-parser = withText genOutput
+parser = withText $ return . genOutput
 
 charMap :: M.Map Char Char
 charMap = M.fromList $ zip (u ++ f) (f ++ u)

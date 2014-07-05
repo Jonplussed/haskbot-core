@@ -7,5 +7,5 @@ import Registry               (registry)
 import Type.Plugin            (runPlugin)
 import Type.User              (User)
 
-pluginsFor :: User -> Parser String
+pluginsFor :: User -> Parser (IO String)
 pluginsFor = choice . map runPlugin . registry

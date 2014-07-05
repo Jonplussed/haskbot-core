@@ -4,17 +4,18 @@ module Protocol.Slack.Response
 ( response
 ) where
 
-import           Text.Parsec.Char
-import           Text.Parsec.Error
-import           Text.Parsec.Prim
+import Control.Monad.IO.Class (liftIO)
+import Text.Parsec.Char
+import Text.Parsec.Error
+import Text.Parsec.Prim
 
-import           Data.Aeson             hiding (json)
-import           Web.Scotty
+import Data.Aeson hiding (json)
+import Web.Scotty
 
-import           Parser.Combinator      (botName)
-import           Parser.Plugin          (pluginsFor)
+import Parser.Combinator (botName)
+import Parser.Plugin (pluginsFor)
 import qualified Protocol.Slack.Request as R
-import           Type.User              (getUser)
+import Type.User (getUser)
 
 data Response = Response { userName :: String
                          , text     :: String
@@ -27,12 +28,12 @@ instance ToJSON Response where
   toJSON (Response u t) = object [ "text" .= t ]
 
 response :: R.Request -> ActionM ()
-response req = do
+response req =
     case applyPlugins req of
-      Right str -> json $ Response (R.userName req) str
-      Left err  -> fail "cannot parse"
+      Right ioStr -> liftIO ioStr >>= json . Response (R.userName req)
+      Left err    -> fail "cannot parse"
 
-applyPlugins :: R.Request -> Either ParseError String
+applyPlugins :: R.Request -> Either ParseError (IO String)
 applyPlugins req = parse parser str str
   where
     parser = do

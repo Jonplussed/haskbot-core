@@ -32,7 +32,7 @@ pluginFor = newPlugin name helpText . parserFor
 -- private functions
 
 parserFor :: User -> InputParser
-parserFor = withOptArgs . getHelpFor
+parserFor user = withOptArgs $ return . getHelpFor user
 
 listAllText :: User -> String
 listAllText user =

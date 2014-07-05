@@ -14,7 +14,7 @@ import Text.Parsec.Prim   (try)
 
 type Name        = String
 type HelpText    = Text
-type InputParser = Parser String
+type InputParser = Parser (IO String)
 
 data Plugin = Plugin { plName     :: Name
                      , plHelpText :: HelpText
@@ -24,7 +24,7 @@ data Plugin = Plugin { plName     :: Name
 newPlugin :: Name -> HelpText -> InputParser -> Plugin
 newPlugin = Plugin
 
-runPlugin :: Plugin -> Parser String
+runPlugin :: Plugin -> InputParser
 runPlugin p = do
     try . string $ plName p
     plParser p
