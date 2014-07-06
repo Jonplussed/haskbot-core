@@ -1,6 +1,5 @@
 module Parser.Combinator
-( botName
-, text
+( text
 , args
 , optArgs
 ) where
@@ -11,9 +10,6 @@ import Text.Parsec.Combinator
 import Text.Parsec.Prim
 
 -- public functions
-
-botName :: Parser String
-botName = string "haskbot"
 
 text :: Parser String
 text = space >> many1Till anyChar eof

@@ -16,8 +16,6 @@ import qualified Data.ByteString.Char8 as B
 
 import qualified Database.Redis as R
 
-import Type.User
-
 newtype Key   = Key { fromKey' :: B.ByteString }
 newtype Value = Value { fromValue' :: B.ByteString }
 

@@ -2,13 +2,13 @@
 
 module Plugins.Flip (plugin) where
 
-import           Data.Char      (toLower)
-import           Data.List      (foldl')
-import qualified Data.Map       as M
+import Data.Char (toLower)
+import Data.List (foldl')
+import qualified Data.Map as M
 
-import           Parser.Common  (withText)
-import           Type.Plugin    (Plugin, Name, HelpText, InputParser,
-                                 newPlugin)
+import Parser.Common (withText)
+import Type.Plugin
+import Type.SlackMsg
 
 -- constants
 
@@ -25,13 +25,13 @@ flippedLets = "ɐqɔpǝɟƃɥᴉɾʞlɯuodbɹsʇnʌʍxʎz˙¡¿)(][><"
 
 -- public functions
 
-plugin :: Plugin
-plugin = newPlugin name helpText parser
+plugin :: SlackMsg -> Plugin
+plugin = newPlugin name helpText . parser
 
 -- private functions
 
-parser :: InputParser
-parser = withText $ return . genOutput
+parser :: SlackMsg -> InputParser
+parser _ = withText $ return . genOutput
 
 charMap :: M.Map Char Char
 charMap = M.fromList $ zip (u ++ f) (f ++ u)

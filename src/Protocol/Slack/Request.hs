@@ -1,28 +1,14 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Protocol.Slack.Request
-( Request (..)
-, request
-) where
+module Protocol.Slack.Request (request) where
 
-import Control.Applicative    ((<$>), (<*>))
+import Control.Applicative ((<$>), (<*>))
 import Control.Monad.IO.Class (liftIO)
-import System.Environment     (getEnv)
-import Web.Scotty             hiding (request)
+import System.Environment (getEnv)
 
-import Type.User              (HasUser (getUser), fromStrings)
+import Web.Scotty hiding (request)
 
-data Request = Request { teamId      :: String
-                       , channelId   :: String
-                       , channelName :: String
-                       , timestamp   :: String
-                       , userId      :: String
-                       , userName    :: String
-                       , text        :: String
-                       } deriving (Eq, Show)
-
-instance HasUser Request where
-  getUser req = fromStrings (userId req) (userName req)
+import Type.SlackMsg
 
 -- constants
 
@@ -31,7 +17,7 @@ tokenVar = "SLACK_OUTGOING_TOKEN"
 
 -- public functions
 
-request :: ActionM Request
+request :: ActionM SlackMsg
 request = authorize >> fromParams
 
 -- private functions
@@ -44,11 +30,11 @@ authorize = do
       then return ()
       else fail "unauthorized"
 
-fromParams :: ActionM Request
-fromParams = Request <$> param "team_id"
-                     <*> param "channel_id"
-                     <*> param "channel_name"
-                     <*> param "timestamp"
-                     <*> param "user_id"
-                     <*> param "user_name"
-                     <*> param "text"
+fromParams :: ActionM SlackMsg
+fromParams = newSlackMsg <$> param "team_id"
+                         <*> param "channel_id"
+                         <*> param "channel_name"
+                         <*> param "user_id"
+                         <*> param "user_name"
+                         <*> param "command"
+                         <*> param "text"

@@ -5,10 +5,9 @@ import qualified Data.ByteString.Char8 as B
 import qualified Data.Text as T
 
 import Parser.Common (withArgs)
-import Persistence.Redis (Key, Value, toKey, toValue, fromValue, getWithDefault,
-                          setWithDefault)
-import Type.Plugin (Plugin, Name, HelpText, InputParser, newPlugin)
-import Type.User (User, UserName (UserName), userName)
+import Persistence.Redis
+import Type.Plugin
+import Type.SlackMsg
 
 -- constants
 
@@ -25,27 +24,27 @@ defStatus = "fine and dandy"
 
 -- public functions
 
-pluginFor :: User -> Plugin
+pluginFor :: SlackMsg -> Plugin
 pluginFor = newPlugin name helpText . parser
 
 -- private functions
 
-parser :: User -> InputParser
-parser user = withArgs $ liftA fromValue . getOrSetStatus user
+parser :: SlackMsg -> InputParser
+parser slackMsg = withArgs $ liftA fromValue . getOrSetStatus slackMsg
 
-getOrSetStatus :: User -> [String] -> IO Value
+getOrSetStatus :: SlackMsg -> [String] -> IO Value
 getOrSetStatus _ ["of", name] = getStatus $ UserName name
-getOrSetStatus user status    = setStatus user $ unwords status
+getOrSetStatus slackMsg status    = setStatus slackMsg $ unwords status
 
 statusKey :: UserName -> Key
 statusKey (UserName name) = toKey $ "status-" ++ name
 
 getStatus :: UserName -> IO Value
-getStatus userName = getWithDefault defStatus $ statusKey userName
+getStatus slackMsgName = getWithDefault defStatus $ statusKey slackMsgName
 
-setStatus :: User -> String -> IO Value
-setStatus user status = setWithDefault reply (toValue status) key
+setStatus :: SlackMsg -> String -> IO Value
+setStatus slackMsg status = setWithDefault reply (toValue status) key
   where
-    key   = statusKey $ userName user
+    key   = statusKey $ userName slackMsg
     reply = "Your status is now \"" ++ status ++ "\"."
 

@@ -1,11 +1,24 @@
-module Parser.Plugin (pluginsFor) where
+module Parser.Plugin (applyPlugins) where
 
-import Text.Parsec.String     (Parser)
+import qualified Data.Text as T
 import Text.Parsec.Combinator (choice)
+import Text.Parsec.Error (ParseError)
+import Text.Parsec.Prim (parse)
+import Text.Parsec.String (Parser)
 
-import Registry               (registry)
-import Type.Plugin            (runPlugin)
-import Type.User              (User)
+import Registry (registry)
+import Type.Plugin (runPlugin)
+import Type.SlackMsg
 
-pluginsFor :: User -> Parser (IO String)
+-- public function
+
+applyPlugins :: SlackMsg -> Either ParseError (IO String)
+applyPlugins slackMsg = parse parser str str
+  where
+    parser = pluginsFor slackMsg
+    str = T.unpack $ text slackMsg
+
+-- private functions
+
+pluginsFor :: SlackMsg -> Parser (IO String)
 pluginsFor = choice . map runPlugin . registry

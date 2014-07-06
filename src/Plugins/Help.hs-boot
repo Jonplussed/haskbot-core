@@ -1,6 +1,6 @@
-module Plugins.Help (pluginFor) where
+module Plugins.Help (plugin) where
 
-import Type.User     (User)
-import Type.Plugin   (Plugin)
+import Type.Plugin (Plugin)
+import Type.SlackMsg (SlackMsg)
 
-pluginFor :: User -> Plugin
+plugin :: SlackMsg -> Plugin

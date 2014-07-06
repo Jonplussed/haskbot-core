@@ -1,25 +1,19 @@
 module Type.SlackMsg
-( TeamId
-, getTeamId
-, ChannelId
-, getChannelId
-, ChannelName
-, getChannelName
-, TimeStamp
-, getTimeStamp
-, UserId
-, getUserId
-, UserName
-, getUserName
+( TeamId (..)
+, ChannelId (..)
+, ChannelName (..)
+, UserId (..)
+, UserName (..)
+, Command (..)
 , SlackMsg
 , teamId
 , channelId
 , channelName
-, timeStamp
 , userId
 , userName
+, command
 , text
-, fromStrings
+, newSlackMsg
 ) where
 
 import qualified Data.Text as T
@@ -27,20 +21,20 @@ import qualified Data.Text as T
 newtype TeamId      = TeamId      { getTeamId      :: String } deriving (Eq, Show)
 newtype ChannelId   = ChannelId   { getChannelId   :: String } deriving (Eq, Show)
 newtype ChannelName = ChannelName { getChannelName :: String } deriving (Eq, Show)
-newtype TimeStamp   = TimeStamp   { getTimeStamp   :: String } deriving (Eq, Show)
 newtype UserId      = UserId      { getUserId      :: String } deriving (Eq, Show)
 newtype UserName    = UserName    { getUserName    :: String } deriving (Eq, Show)
+newtype Command     = Command     { getCommand     :: String } deriving (Eq, Show)
 
 data SlackMsg = SlackMsg { teamId      :: TeamId
                          , channelId   :: ChannelId
                          , channelName :: ChannelName
-                         , timeStamp   :: TimeStamp
                          , userId      :: UserId
                          , userName    :: UserName
+                         , command     :: Command
                          , text        :: T.Text
                          } deriving (Eq, Show)
 
-fromStrings
+newSlackMsg
   :: String
   -> String
   -> String
@@ -49,17 +43,17 @@ fromStrings
   -> String
   -> String
   -> SlackMsg
-fromStrings teamId
+newSlackMsg teamId
             channelId
             channelName
-            timeStamp
             userId
             userName
+            command
             text =
   SlackMsg (TeamId teamId)
            (ChannelId channelId)
            (ChannelName channelName)
-           (TimeStamp timeStamp)
            (UserId userId)
            (UserName userName)
+           (Command command)
            (T.pack text)

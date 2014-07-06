@@ -2,17 +2,16 @@
 
 module Plugins.Help
 ( listAllText
-, pluginFor
+, plugin
 ) where
 
-import Data.List     (find, intercalate)
-import Data.Text     (unpack)
+import Data.List (find, intercalate)
+import Data.Text (unpack)
 
 import Parser.Common (withOptArgs)
-import Registry      (registry)
-import Type.Plugin   (Plugin, Name, HelpText, InputParser, plName,
-                      plHelpText, newPlugin)
-import Type.User     (User)
+import Registry (registry)
+import Type.Plugin
+import Type.SlackMsg
 
 -- constants
 
@@ -26,27 +25,27 @@ helpText =
 
 -- public functions
 
-pluginFor :: User -> Plugin
-pluginFor = newPlugin name helpText . parserFor
+plugin :: SlackMsg -> Plugin
+plugin = newPlugin name helpText . parserFor
 
 -- private functions
 
-parserFor :: User -> InputParser
-parserFor user = withOptArgs $ return . getHelpFor user
+parserFor :: SlackMsg -> InputParser
+parserFor slackMsg = withOptArgs $ return . getHelpFor slackMsg
 
-listAllText :: User -> String
-listAllText user =
-    "Available commands: " ++ listFor user ++ ". To get help for a specific\
-    \ command, use `haskbot help [command]`."
+listAllText :: SlackMsg -> String
+listAllText slackMsg =
+    "Available commands: " ++ listFor slackMsg ++ ". To get help for a\
+    \ specific command, use `/haskbot help [command]`."
   where
     listFor        = intercalate ", " . map plName' . registry
     plName' plugin = "`" ++ plName plugin ++ "`"
 
-getHelpFor :: User -> [String] -> String
-getHelpFor user []       = listAllText user
-getHelpFor user (a:args) =
+getHelpFor :: SlackMsg -> [String] -> String
+getHelpFor slackMsg []       = listAllText slackMsg
+getHelpFor slackMsg (a:args) =
   case plugin of
     Just p  -> unpack $ plHelpText p
-    Nothing -> listAllText user
+    Nothing -> listAllText slackMsg
   where
-    plugin = find (\p -> plName p == a) $ registry user
+    plugin = find (\p -> plName p == a) $ registry slackMsg
