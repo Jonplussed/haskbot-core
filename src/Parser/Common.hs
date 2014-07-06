@@ -5,9 +5,7 @@ module Parser.Common
 ) where
 
 import Parser.Combinator (text, args, optArgs)
-import Type.Plugin       (InputParser)
-
-type Command = String
+import Type.Plugin (InputParser)
 
 -- public functions
 

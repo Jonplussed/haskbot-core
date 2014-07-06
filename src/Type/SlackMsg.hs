@@ -16,14 +16,14 @@ module Type.SlackMsg
 , newSlackMsg
 ) where
 
-import qualified Data.Text as T
+import Data.Text
 
-newtype TeamId      = TeamId      { getTeamId      :: String } deriving (Eq, Show)
-newtype ChannelId   = ChannelId   { getChannelId   :: String } deriving (Eq, Show)
-newtype ChannelName = ChannelName { getChannelName :: String } deriving (Eq, Show)
-newtype UserId      = UserId      { getUserId      :: String } deriving (Eq, Show)
-newtype UserName    = UserName    { getUserName    :: String } deriving (Eq, Show)
-newtype Command     = Command     { getCommand     :: String } deriving (Eq, Show)
+newtype TeamId      = TeamId      { getTeamId      :: Text } deriving (Eq, Show)
+newtype ChannelId   = ChannelId   { getChannelId   :: Text } deriving (Eq, Show)
+newtype ChannelName = ChannelName { getChannelName :: Text } deriving (Eq, Show)
+newtype UserId      = UserId      { getUserId      :: Text } deriving (Eq, Show)
+newtype UserName    = UserName    { getUserName    :: Text } deriving (Eq, Show)
+newtype Command     = Command     { getCommand     :: Text } deriving (Eq, Show)
 
 data SlackMsg = SlackMsg { teamId      :: TeamId
                          , channelId   :: ChannelId
@@ -31,16 +31,16 @@ data SlackMsg = SlackMsg { teamId      :: TeamId
                          , userId      :: UserId
                          , userName    :: UserName
                          , command     :: Command
-                         , text        :: T.Text
+                         , text        :: String
                          } deriving (Eq, Show)
 
 newSlackMsg
-  :: String
-  -> String
-  -> String
-  -> String
-  -> String
-  -> String
+  :: Text
+  -> Text
+  -> Text
+  -> Text
+  -> Text
+  -> Text
   -> String
   -> SlackMsg
 newSlackMsg teamId
@@ -56,4 +56,4 @@ newSlackMsg teamId
            (UserId userId)
            (UserName userName)
            (Command command)
-           (T.pack text)
+           text

@@ -7,10 +7,10 @@ module Type.Plugin
 , runPlugin
 ) where
 
-import Data.Text          (Text)
+import Data.Text (Text)
 import Text.Parsec.String (Parser)
-import Text.Parsec.Char   (string)
-import Text.Parsec.Prim   (try)
+import Text.Parsec.Char (string)
+import Text.Parsec.Prim (try)
 
 type Name        = String
 type HelpText    = Text
