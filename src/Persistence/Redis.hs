@@ -1,6 +1,8 @@
 module Persistence.Redis
-( Key
-, Value
+( Key       (..)
+, Value     (..)
+, Hash      (..)
+, RedisTry
 , toKey
 , fromKey
 , toValue
@@ -12,12 +14,17 @@ module Persistence.Redis
 ) where
 
 import Control.Applicative
-import qualified Data.ByteString.Char8 as B
+import Data.ByteString.Char8 (ByteString)
+import Data.Text (Text)
+import Data.Text.Encoding (encodeUtf8, decodeUtf8)
 
 import qualified Database.Redis as R
 
-newtype Key   = Key { fromKey' :: B.ByteString }
-newtype Value = Value { fromValue' :: B.ByteString }
+newtype Key   = Key   { fromKey'   :: ByteString }
+newtype Value = Value { fromValue' :: ByteString }
+newtype Hash  = Hash  { fromHash'  :: [(ByteString, ByteString)] }
+
+type RedisTry = IO (Either R.Reply R.Status)
 
 -- constants
 
@@ -26,17 +33,17 @@ connError = fail "connection to Redis server failed"
 
 -- public functions
 
-toKey :: String -> Key
-toKey = Key . B.pack
+toKey :: Text -> Key
+toKey = Key . encodeUtf8
 
-fromKey :: Key -> String
-fromKey = B.unpack . fromKey'
+fromKey :: Key -> Text
+fromKey = decodeUtf8 . fromKey'
 
-toValue :: String -> Value
-toValue = Value . B.pack
+toValue :: Text -> Value
+toValue = Value . encodeUtf8
 
-fromValue :: Value -> String
-fromValue = B.unpack . fromValue'
+fromValue :: Value -> Text
+fromValue = decodeUtf8 . fromValue'
 
 get :: Key -> IO (Maybe Value)
 get key =
@@ -46,17 +53,17 @@ get key =
       Left _    -> connError
       Right v   -> return $ fmap Value v
 
-getWithDefault :: String -> Key -> IO Value
+getWithDefault :: Text -> Key -> IO Value
 getWithDefault def key = do
     val <- get key
     return $ case val of
       Just v -> v
       _      -> toValue def
 
-set :: Value -> Key -> IO (Either R.Reply R.Status)
+set :: Value -> Key -> RedisTry
 set value key = redisConn $ R.set (fromKey' key) (fromValue' value)
 
-setWithDefault :: String -> Value -> Key -> IO Value
+setWithDefault :: Text -> Value -> Key -> IO Value
 setWithDefault def val key = do
     status <- set val key
     case status of
