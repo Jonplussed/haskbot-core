@@ -66,6 +66,3 @@ fromParams = newSlashCom <$> W.param "token"
                          <*> W.param "user_name"
                          <*> W.param "command"
                          <*> W.param "text"
-
-response :: W.ActionM ()
-response = W.text "200 OK"
