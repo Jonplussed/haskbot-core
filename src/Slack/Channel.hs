@@ -3,9 +3,10 @@
 module Slack.Channel
 ( Channel (..)
 , toText
+, fromText
 ) where
 
-import Data.Text (Text, append)
+import qualified Data.Text as T
 
 import Slack.Types
 
@@ -15,12 +16,18 @@ data Channel = DirectMsg { to   :: UserName }
 
 -- constants
 
-dmPrefix, chPrefix :: Text
-dmPrefix = "@"
-chPrefix = "#"
+dmPrefix, chPrefix :: Char
+dmPrefix = '@'
+chPrefix = '#'
 
 -- public functions
 
-toText :: Channel -> Text
-toText (DirectMsg dm) = append dmPrefix $ getUserName dm
-toText (Channel ch)   = append chPrefix $ getChanName ch
+toText :: Channel -> T.Text
+toText (DirectMsg dm) = T.append (T.singleton dmPrefix) (getUserName dm)
+toText (Channel ch)   = T.append (T.singleton chPrefix) (getChanName ch)
+
+fromText :: T.Text -> Channel
+fromText t
+  | T.head t == dmPrefix = DirectMsg . UserName $ T.tail t
+  | T.head t == chPrefix = Channel . ChannelName $ T.tail t
+  | otherwise            = Channel $ ChannelName t
