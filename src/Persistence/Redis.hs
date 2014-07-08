@@ -4,13 +4,10 @@ module Persistence.Redis
 , Hash      (..)
 , RedisTry
 , toKey
-, fromKey
 , toValue
 , fromValue
 , get
-, getWithDefault
 , set
-, setWithDefault
 ) where
 
 import Control.Applicative
@@ -36,9 +33,6 @@ connError = fail "connection to Redis server failed"
 toKey :: Text -> Key
 toKey = Key . encodeUtf8
 
-fromKey :: Key -> Text
-fromKey = decodeUtf8 . fromKey'
-
 toValue :: Text -> Value
 toValue = Value . encodeUtf8
 
@@ -46,31 +40,24 @@ fromValue :: Value -> Text
 fromValue = decodeUtf8 . fromValue'
 
 get :: Key -> IO (Maybe Value)
-get key =
-  redisConn $ do
-    val <- R.get (fromKey' key)
-    case val of
-      Left _    -> connError
-      Right v   -> return $ fmap Value v
+get (Key k) = redisConn $ R.get k >>= getValue
 
-getWithDefault :: Text -> Key -> IO Value
-getWithDefault def key = do
-    val <- get key
-    return $ case val of
-      Just v -> v
-      _      -> toValue def
-
-set :: Value -> Key -> RedisTry
-set value key = redisConn $ R.set (fromKey' key) (fromValue' value)
-
-setWithDefault :: Text -> Value -> Key -> IO Value
-setWithDefault def val key = do
-    status <- set val key
-    case status of
-      Left _  -> connError
-      Right _ -> return $ toValue def
+set :: Value -> Key -> IO ()
+set (Value v) (Key k) = redisConn $ R.set k v >>= doNothing
 
 -- private functions
 
 redisConn :: R.Redis a -> IO a
 redisConn r = R.connect R.defaultConnectInfo >>= flip R.runRedis r
+
+onSuccess :: (a -> b) -> Either R.Reply a -> R.Redis b
+onSuccess f status =
+  case status of
+    Left _    -> connError
+    Right val -> return $ f val
+
+doNothing :: Either R.Reply a -> R.Redis ()
+doNothing = onSuccess $ \_ -> ()
+
+getValue :: Either R.Reply (Maybe ByteString) -> R.Redis (Maybe Value)
+getValue  = onSuccess $ \v -> Value <$> v
