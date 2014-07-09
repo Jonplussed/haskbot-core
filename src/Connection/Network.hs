@@ -1,4 +1,4 @@
-module Connection.Slack where
+module Connection.Network where
 
 -- constants
 
@@ -8,12 +8,7 @@ asJson = "application/json"
 slackUrl :: String
 slackUrl = "https://bendyworks.slack.com/services/hooks/incoming-webhook"
 
--- public functions
-
-
 -- private functions
 
 slackUrlWithToken :: String -> String
 slackUrlWithToken t = slackUrl ++ "?token=" ++ t
-
-
