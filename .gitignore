@@ -12,6 +12,3 @@ dist
 # sandbox configs should be instance-specific
 .cabal-sandbox
 cabal.sandbox.config
-
-# contains secret tokens
-src/Settings.hs

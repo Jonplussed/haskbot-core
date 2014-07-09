@@ -2,6 +2,7 @@
 
 module Slack.SlashCom
 ( SlashCom (..)
+, channel
 , fromParams
 ) where
 
@@ -11,6 +12,7 @@ import qualified Data.Text as T
 import Web.Scotty (ActionM, param)
 
 import Slack.Types
+import Slack.Channel
 
 data SlashCom = SlashCom { token       :: Token
                          , teamId      :: TeamId
@@ -22,23 +24,9 @@ data SlashCom = SlashCom { token       :: Token
                          , text        :: T.Text
                          } deriving (Eq, Show)
 
-newSlashCom :: T.Text
-            -> T.Text
-            -> T.Text
-            -> T.Text
-            -> T.Text
-            -> T.Text
-            -> T.Text
-            -> T.Text
-            -> SlashCom
-newSlashCom token
-            teamId
-            channelId
-            channelName
-            userId
-            userName
-            command
-            text =
+newSlashCom :: T.Text -> T.Text -> T.Text -> T.Text -> T.Text -> T.Text
+            -> T.Text -> T.Text -> SlashCom
+newSlashCom token teamId channelId channelName userId userName command text =
   SlashCom (Token token)
            (TeamId teamId)
            (ChannelId channelId)
@@ -47,6 +35,9 @@ newSlashCom token
            (UserName userName)
            (Command $ T.tail command)
            text
+
+channel :: SlashCom -> Channel
+channel = fromText . getChanName . channelName
 
 fromParams :: ActionM SlashCom
 fromParams = newSlashCom <$> param "token"

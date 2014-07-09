@@ -12,13 +12,13 @@ import Web.Scotty (ActionM)
 import qualified Connection.MemStore as M
 import Slack.Channel
 
-data Incoming = Incoming { channel :: Channel
-                         , text    :: T.Text
+data Incoming = Incoming { incChan :: Channel
+                         , incText :: T.Text
                          } deriving (Eq, Show)
 
 instance ToJSON Incoming where
-  toJSON inc = object [ "channel" .= toText (channel inc)
-                      , "text"    .= text inc
+  toJSON inc = object [ "channel" .= toText (incChan inc)
+                      , "text"    .= incText inc
                       ]
 
 -- constants
