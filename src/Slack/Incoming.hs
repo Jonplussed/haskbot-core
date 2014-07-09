@@ -2,15 +2,14 @@
 
 module Slack.Incoming where
 
-import Control.Monad.IO.Class (liftIO)
 import qualified Data.ByteString.Char8 as BS
 import qualified Data.ByteString.Lazy as BL
 import qualified Data.Text as T
-import Data.Time.Clock.POSIX (POSIXTime, getPOSIXTime)
 
-import Data.Aeson
+import Data.Aeson (ToJSON, Object, (.=), encode, object, toJSON)
+import Web.Scotty (ActionM)
 
-import qualified Persistence.Redis as R
+import qualified Connection.MemStore as M
 import Slack.Channel
 
 data Incoming = Incoming { channel :: Channel
@@ -22,18 +21,19 @@ instance ToJSON Incoming where
                       , "text"    .= text inc
                       ]
 
-queueKeyAt :: POSIXTime -> R.Key
-queueKeyAt diffTime = R.Key $ BS.pack keyStr
-  where
-    keyStr = "incoming-" ++ show sortID
-    sortID = truncate $ diffTime * 1000000
+-- constants
 
-queueValFor :: Incoming -> R.Value
-queueValFor inc = R.Value . BL.toStrict $ encode inc
+queueKey :: M.Key
+queueKey = M.toKey ("incoming-queue" :: T.Text)
 
-enqueue :: Incoming -> IO R.RedisTry
-enqueue inc = do
-  now <- getPOSIXTime
-  let key = queueKeyAt now
-      val = queueValFor inc
-  return $ R.set val key
+-- public functions
+
+enqueue :: Incoming -> IO ()
+enqueue inc = M.enqueue value queueKey
+  where value = M.toValue . encode $ toJSON inc
+
+--dequeue :: ActionM ()
+--dequeue = M.dequeue queueKey >> sendToSlack
+
+--sendToSlack :: M.Value -> ActionM ()
+--sendToSlack (Value v) =
