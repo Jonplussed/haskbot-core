@@ -1,22 +1,14 @@
 {-# LANGUAGE OverloadedStrings #-}
 
 module Slack.SlashCom
-( SlashCom
-, teamId
-, channelId
-, channelName
-, userId
-, userName
-, command
-, text
-, newSlashCom
+( SlashCom (..)
 , fromParams
 ) where
 
 import Control.Applicative ((<$>), (<*>))
-import Data.Text (Text)
+import qualified Data.Text as T
 
-import qualified Web.Scotty as W
+import Web.Scotty (ActionM, param)
 
 import Slack.Types
 
@@ -27,19 +19,18 @@ data SlashCom = SlashCom { token       :: Token
                          , userId      :: UserId
                          , userName    :: UserName
                          , command     :: Command
-                         , text        :: Text
+                         , text        :: T.Text
                          } deriving (Eq, Show)
 
-newSlashCom
-  :: Text
-  -> Text
-  -> Text
-  -> Text
-  -> Text
-  -> Text
-  -> Text
-  -> Text
-  -> SlashCom
+newSlashCom :: T.Text
+            -> T.Text
+            -> T.Text
+            -> T.Text
+            -> T.Text
+            -> T.Text
+            -> T.Text
+            -> T.Text
+            -> SlashCom
 newSlashCom token
             teamId
             channelId
@@ -54,15 +45,15 @@ newSlashCom token
            (ChannelName channelName)
            (UserId userId)
            (UserName userName)
-           (Command command)
+           (Command $ T.tail command)
            text
 
-fromParams :: W.ActionM SlashCom
-fromParams = newSlashCom <$> W.param "token"
-                         <*> W.param "team_id"
-                         <*> W.param "channel_id"
-                         <*> W.param "channel_name"
-                         <*> W.param "user_id"
-                         <*> W.param "user_name"
-                         <*> W.param "command"
-                         <*> W.param "text"
+fromParams :: ActionM SlashCom
+fromParams = newSlashCom <$> param "token"
+                         <*> param "team_id"
+                         <*> param "channel_id"
+                         <*> param "channel_name"
+                         <*> param "user_id"
+                         <*> param "user_name"
+                         <*> param "command"
+                         <*> param "text"
