@@ -1,15 +1,17 @@
+{-# LANGUAGE OverloadedStrings #-}
+
 module Registry (registry) where
 
-import Type.Plugin (Plugin)
-import Type.SlackMsg (SlackMsg)
-import qualified Plugins.Flip as Flip
+import Slack.Plugin (Plugin)
+import Slack.SlashCom (SlashCom)
+import qualified Plugin.Flip as Flip
 
 -- this breaks the circular dependency required by the "help" plugin
-import {-# SOURCE #-} qualified Plugins.Help as Help
+import {-# SOURCE #-} qualified Plugin.Help as Help
 
-registry :: SlackMsg -> [Plugin]
-registry slackMsg = map (\f -> f slackMsg)
+registry :: [Plugin]
+registry =
 
-  [ Flip.plugin
-  , Help.plugin
+  [ Flip.register "flip token"
+  , Help.register "help token"
   ]

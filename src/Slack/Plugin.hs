@@ -1,8 +1,12 @@
 module Slack.Plugin
-( Plugin
-, Reply (..)
-, Handler
+( Handler
+, HelpText
+, Name
+, Plugin (..)
+, Reply  (..)
+, Token
 , apply
+, isAuthorized
 , newPlugin
 , selectFrom
 ) where
@@ -11,18 +15,21 @@ import Data.List (find)
 import Data.Text (Text)
 
 import Slack.SlashCom (SlashCom, command, token)
-import Slack.Types (Command (..), Token (..))
+import qualified Slack.Types as T
 import Slack.Incoming (Incoming, enqueue)
 
-type Handler = SlashCom -> IO Reply
+type Name     = Text
+type HelpText = Text
+type Handler  = SlashCom -> IO Reply
+type Token    = Text
 
 data Reply = ViaHaskbot Incoming
            | NoReply
 
-data Plugin = Plugin { plCommand  :: Command
+data Plugin = Plugin { plCommand  :: T.Command
                      , plHelpText :: Text
                      , plHandler  :: Handler
-                     , plToken    :: Token
+                     , plToken    :: T.Token
                      }
 
 apply :: Plugin -> SlashCom -> IO ()
@@ -34,7 +41,7 @@ apply plugin slashCom = do
 
 newPlugin :: Text -> Text -> Handler -> Text -> Plugin
 newPlugin com help handler token =
-  Plugin (Command com) help handler (Token token)
+  Plugin (T.Command com) help handler (T.Token token)
 
 isAuthorized :: Plugin -> SlashCom -> Bool
 isAuthorized plugin slashCom = plToken plugin == token slashCom
