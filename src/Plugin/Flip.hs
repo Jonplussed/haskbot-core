@@ -42,7 +42,7 @@ charMap = M.fromList $ zip (u ++ f) (f ++ u)
     f = flippedLets
 
 flipIt :: T.Text -> T.Text
-flipIt str = T.append "(╯°□°）╯︵ " $ flipChars str
+flipIt = T.append "(╯°□°)╯︵" . flipChars
 
 flipChars :: T.Text -> T.Text
 flipChars "table" = "┻━┻"

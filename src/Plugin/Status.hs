@@ -26,25 +26,25 @@ register = newPlugin name helpText handler
 
 -- private functions
 
-defaultStatus :: UserName -> T.Text
-defaultStatus user = T.append (getAtUserName user) " has not set a status"
+noStatus :: UserName -> T.Text
+noStatus user = T.unwords [getAtUserName user, "has not set a status"]
 
 handler :: HandlerFn
 handler slashCom =
   case T.words (text slashCom) of
-    ["of", name] -> getStatus name >>= viaHaskbot (replySameChan slashCom)
+    ["of", name] -> getStatus name >>= viaHaskbot (replyViaDM slashCom)
     status       -> setStatus slashCom >> noReply
 
 statusKey :: UserName -> Key
-statusKey user = toKey $ T.append "status-" (getUserName user)
+statusKey user = toKey . T.append "status-" $ getUserName user
 
 getStatus :: T.Text -> IO T.Text
 getStatus name = do
     let user = setUserName name
     val <- get (statusKey user)
     return $ case val of
-      Just st -> T.intercalate " " [getAtUserName user, "is", fromValue st]
-      Nothing -> defaultStatus user
+      Just st -> T.unwords [getAtUserName user, "is", fromValue st]
+      Nothing -> noStatus user
 
 setStatus :: SlashCom -> IO ()
 setStatus slashCom = set value key
