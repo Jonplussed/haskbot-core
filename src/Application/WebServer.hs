@@ -5,25 +5,25 @@ module Application.WebServer (webServer) where
 import Control.Monad.IO.Class (liftIO)
 
 import Network.HTTP.Types.Status (badRequest400, unauthorized401)
-import Web.Scotty
+import qualified Web.Scotty as S
 
-import Registry (registry)
-import Slack.Plugin (apply, isAuthorized, selectFrom)
-import Slack.SlashCom (SlashCom, fromParams)
-import Slack.Types (getCommand)
+import Registry
+import Slack.Plugin
+import Slack.SlashCom
+import Slack.Types
 
 -- public functions
 
 webServer :: Int -> IO ()
-webServer port = scotty port . post "/slack" $ fromParams >>= applyPlugin
+webServer port = S.scotty port . S.post "/slack" $ fromParams >>= applyPlugin
 
 -- private functions
 
-applyPlugin :: SlashCom -> ActionM ()
+applyPlugin :: SlashCom -> S.ActionM ()
 applyPlugin slashCom =
-  case selectFrom registry slashCom of
+  case selectFrom registry (command slashCom) of
     Just plugin ->
       if isAuthorized plugin slashCom
-      then liftIO (apply plugin slashCom) >> text "200 OK"
-      else status unauthorized401         >> text "401 Unauthorized"
-    _ -> status badRequest400             >> text "400 Bad Request"
+      then liftIO (apply plugin slashCom) >> S.text "200 OK"
+      else S.status unauthorized401       >> S.text "401 Unauthorized"
+    _ -> S.status badRequest400           >> S.text "400 Bad Request"

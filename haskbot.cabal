@@ -27,6 +27,7 @@ executable            haskbot
   hs-source-dirs:     src
   main-is:            Main.hs
   build-depends:      containers >= 0.5,
+                      http-types >= 0.8.5,
                       bytestring >= 0.10,
                       text >= 0.11,
                       transformers >= 0.3,
@@ -41,6 +42,7 @@ test-suite            spec
   main-is:            Spec.hs
   build-depends:      hspec >= 1.8,
                       containers >= 0.5,
+                      http-types >= 0.8.5,
                       bytestring >= 0.10,
                       text >= 0.11,
                       transformers >= 0.3,
