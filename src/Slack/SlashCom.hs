@@ -49,8 +49,8 @@ newSlashCom :: T.Text -> T.Text -> T.Text -> T.Text -> T.Text -> T.Text
 newSlashCom a b c d e f g =
   SlashCom (setToken a)
            (setTeamID b)
-           (setChannelID c)
-           (setChannelName d)
+           (setChanID c)
+           (setChanName d)
            (setUserID e)
            (setUserName f)
            (setCommand g)
