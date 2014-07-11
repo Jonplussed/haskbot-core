@@ -7,14 +7,14 @@ module Slack.Types
 , UserName    (getUserName)
 , Command     (getCommand)
 , Channel     (DirectMsg, Channel)
-, address
+, getAddress
 , getAtUserName
 , getPoundChan
 , getSlashCom
 , setToken
 , setTeamID
-, setChannelID
-, setChannelName
+, setChanID
+, setChanName
 , setUserID
 , setUserName
 , setCommand
@@ -43,9 +43,9 @@ prefixUser = '@'
 
 -- public functions
 
-address :: Channel -> T.Text
-address (DirectMsg un) = getAtUserName un
-address (Channel ch)   = getPoundChan ch
+getAddress :: Channel -> T.Text
+getAddress (DirectMsg un) = getAtUserName un
+getAddress (Channel ch)   = getPoundChan ch
 
 getAtUserName :: UserName -> T.Text
 getAtUserName = T.append (T.singleton prefixUser) . getUserName
@@ -62,11 +62,11 @@ setToken = Token
 setTeamID :: T.Text -> TeamID
 setTeamID = TeamID
 
-setChannelID :: T.Text -> ChannelID
-setChannelID = ChannelID
+setChanID :: T.Text -> ChannelID
+setChanID = ChannelID
 
-setChannelName :: T.Text -> ChannelName
-setChannelName = prefixedBy prefixChan ChannelName
+setChanName :: T.Text -> ChannelName
+setChanName = prefixedBy prefixChan ChannelName
 
 setUserID :: T.Text -> UserID
 setUserID = UserID
