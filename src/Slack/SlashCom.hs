@@ -2,8 +2,9 @@
 
 module Slack.SlashCom
 ( SlashCom (..)
-, channel
 , fromParams
+, replySameChan
+, replyViaDM
 ) where
 
 import Control.Applicative ((<$>), (<*>))
@@ -12,32 +13,18 @@ import qualified Data.Text as T
 import Web.Scotty (ActionM, param)
 
 import Slack.Types
-import Slack.Channel
 
 data SlashCom = SlashCom { token       :: Token
-                         , teamId      :: TeamId
-                         , channelId   :: ChannelId
+                         , teamID      :: TeamID
+                         , channelID   :: ChannelID
                          , channelName :: ChannelName
-                         , userId      :: UserId
+                         , userID      :: UserID
                          , userName    :: UserName
                          , command     :: Command
                          , text        :: T.Text
                          } deriving (Eq, Show)
 
-newSlashCom :: T.Text -> T.Text -> T.Text -> T.Text -> T.Text -> T.Text
-            -> T.Text -> T.Text -> SlashCom
-newSlashCom token teamId channelId channelName userId userName command text =
-  SlashCom (Token token)
-           (TeamId teamId)
-           (ChannelId channelId)
-           (ChannelName channelName)
-           (UserId userId)
-           (UserName userName)
-           (Command $ T.tail command)
-           text
-
-channel :: SlashCom -> Channel
-channel = fromText . getChanName . channelName
+-- public functions
 
 fromParams :: ActionM SlashCom
 fromParams = newSlashCom <$> param "token"
@@ -48,3 +35,22 @@ fromParams = newSlashCom <$> param "token"
                          <*> param "user_name"
                          <*> param "command"
                          <*> param "text"
+
+replySameChan :: SlashCom -> Channel
+replySameChan = Channel . channelName
+
+replyViaDM :: SlashCom -> Channel
+replyViaDM = DirectMsg . userName
+
+-- private functions
+
+newSlashCom :: T.Text -> T.Text -> T.Text -> T.Text -> T.Text -> T.Text
+            -> T.Text -> T.Text -> SlashCom
+newSlashCom a b c d e f g =
+  SlashCom (setToken a)
+           (setTeamID b)
+           (setChannelID c)
+           (setChannelName d)
+           (setUserID e)
+           (setUserName f)
+           (setCommand g)

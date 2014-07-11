@@ -2,29 +2,27 @@
 
 module Slack.Incoming where
 
-import qualified Data.ByteString.Char8 as BS
-import qualified Data.ByteString.Lazy as BL
-import qualified Data.Text as T
+import Data.Text (Text)
 
 import Data.Aeson (ToJSON, Object, (.=), encode, object, toJSON)
 import Web.Scotty (ActionM)
 
 import qualified Connection.MemStore as M
-import Slack.Channel
+import Slack.Types
 
 data Incoming = Incoming { incChan :: Channel
-                         , incText :: T.Text
+                         , incText :: Text
                          } deriving (Eq, Show)
 
 instance ToJSON Incoming where
-  toJSON inc = object [ "channel" .= toText (incChan inc)
+  toJSON inc = object [ "channel" .= address (incChan inc)
                       , "text"    .= incText inc
                       ]
 
 -- constants
 
 queueKey :: M.Key
-queueKey = M.toKey ("incoming-queue" :: T.Text)
+queueKey = M.toKey ("incoming-queue" :: Text)
 
 -- public functions
 

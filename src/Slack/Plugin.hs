@@ -1,35 +1,37 @@
 module Slack.Plugin
-( Handler
-, HelpText
-, Name
+( HandlerFn
+, HelpStr
+, NameStr
 , Plugin (..)
 , Reply  (..)
-, Token
+, TokenStr
 , apply
 , isAuthorized
 , newPlugin
+, noReply
 , selectFrom
+, viaHaskbot
 ) where
 
 import Data.List (find)
 import Data.Text (Text)
 
 import Slack.SlashCom (SlashCom, command, token)
-import qualified Slack.Types as T
-import Slack.Incoming (Incoming, enqueue)
+import Slack.Types
+import Slack.Incoming (Incoming (..), enqueue)
 
-type Name     = Text
-type HelpText = Text
-type Handler  = SlashCom -> IO Reply
-type Token    = Text
+type NameStr   = Text
+type HelpStr   = Text
+type HandlerFn = SlashCom -> IO Reply
+type TokenStr  = Text
 
 data Reply = ViaHaskbot Incoming
            | NoReply
 
-data Plugin = Plugin { plCommand  :: T.Command
+data Plugin = Plugin { plCommand  :: Command
                      , plHelpText :: Text
-                     , plHandler  :: Handler
-                     , plToken    :: T.Token
+                     , plHandler  :: HandlerFn
+                     , plToken    :: Token
                      }
 
 apply :: Plugin -> SlashCom -> IO ()
@@ -39,12 +41,18 @@ apply plugin slashCom = do
     ViaHaskbot incoming -> enqueue incoming
     _                   -> return ()
 
-newPlugin :: Text -> Text -> Handler -> Text -> Plugin
-newPlugin com help handler token =
-  Plugin (T.Command com) help handler (T.Token token)
-
 isAuthorized :: Plugin -> SlashCom -> Bool
 isAuthorized plugin slashCom = plToken plugin == token slashCom
 
-selectFrom :: [Plugin] -> SlashCom -> Maybe Plugin
-selectFrom list slashCom = find (\p -> plCommand p == command slashCom) list
+newPlugin :: Text -> Text -> HandlerFn -> Text -> Plugin
+newPlugin com help handler token =
+  Plugin (setCommand com) help handler (setToken token)
+
+noReply :: (Monad m) => m Reply
+noReply = return NoReply
+
+selectFrom :: [Plugin] -> Command -> Maybe Plugin
+selectFrom list com = find (\p -> plCommand p == com) list
+
+viaHaskbot :: (Monad m) => Channel -> Text -> m Reply
+viaHaskbot chan = return . ViaHaskbot . Incoming chan
