@@ -1,5 +1,5 @@
 module Plugin.Help (register) where
 
-import Slack.Plugin (Plugin, Token)
+import Slack.Plugin (Plugin, TokenStr)
 
-register :: Token -> Plugin
+register :: TokenStr -> Plugin

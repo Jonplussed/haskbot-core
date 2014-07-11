@@ -6,16 +6,15 @@ import Data.Char (toLower)
 import qualified Data.Map as M
 import qualified Data.Text as T
 
-import Slack.Incoming
 import Slack.Plugin
 import Slack.SlashCom
 
 -- constants
 
-name :: Name
+name :: NameStr
 name = "flip"
 
-helpText :: HelpText
+helpText :: HelpStr
 helpText = "Displeased with something? Type `haskbot flip [any other text]`\
            \ to have Haskbot cathartically toss what ails you."
 
@@ -25,15 +24,15 @@ flippedLets = "ɐqɔpǝɟƃɥᴉɾʞlɯuodbɹsʇnʌʍxʎz˙¡¿)(][><"
 
 -- public functions
 
-register :: Token -> Plugin
+register :: TokenStr -> Plugin
 register = newPlugin name helpText handler
 
 -- private functions
 
-handler :: Handler
-handler slashCom = return . ViaHaskbot $ Incoming chan reply
+handler :: HandlerFn
+handler slashCom = viaHaskbot chan reply
   where
-    chan  = channel slashCom
+    chan  = replySameChan slashCom
     reply = flipIt $ text slashCom
 
 charMap :: M.Map Char Char

@@ -8,51 +8,47 @@ module Plugin.Help
 import Data.List (find)
 import qualified Data.Text as T
 
-import Registry (registry)
-import Slack.Incoming
+import Registry
 import Slack.Plugin
 import Slack.SlashCom
-import Slack.Types (getCommand)
+import Slack.Types
 
 -- constants
 
-name :: Name
+name :: NameStr
 name = "help"
 
-helpText :: HelpText
+helpText :: HelpStr
 helpText =
     "List all installed plugins via `haskbot help`. To see the help\
     \ text of a particular plugin, use `haskbot help [plugin name]`."
 
 -- public functions
 
-register :: Token -> Plugin
+register :: TokenStr -> Plugin
 register = newPlugin name helpText handler
 
 -- private functions
 
-handler :: Handler
-handler slashCom = return . ViaHaskbot $ Incoming chan reply
+getHelp :: [T.Text] -> T.Text
+getHelp []    = listAllText
+getHelp (comName:_) =
+  case selectFrom registry (setCommand comName) of
+    Just plugin -> plHelpText plugin
+    Nothing     -> listAllText
+
+handler :: HandlerFn
+handler slashCom = viaHaskbot chan reply
   where
-    chan  = channel slashCom
+    chan  = replyViaDM slashCom
     reply = getHelp . T.words $ text slashCom
 
 listAllText :: T.Text
 listAllText =
   T.concat [ "Available commands: "
-           , allCommands
+           , T.intercalate ", " (map pluginName registry)
            , ". To get help for a specific command,\
              \ use `/haskbot help [command]`."
            ]
   where
-    allCommands    = T.intercalate ", " $ map plCom registry
-    plCom plugin = T.concat ["`", getCommand (plCommand plugin), "`"]
-
-getHelp :: [T.Text] -> T.Text
-getHelp []       = listAllText
-getHelp (a:args) =
-  case plugin of
-    Just p  -> plHelpText p
-    Nothing -> listAllText
-  where
-    plugin = find (\p -> getCommand (plCommand p) == a) registry
+    pluginName p = T.concat ["`", getCommand (plCommand p), "`"]
