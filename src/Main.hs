@@ -2,10 +2,14 @@ module Main
 ( main
 ) where
 
+import Control.Monad.Reader
 import System.Environment (getArgs)
 
 import Application.TaskRunner (taskRunner)
 import Application.WebServer (webServer)
+import Connection.MemStore (connection)
+
+data Env = Env
 
 -- constants
 
@@ -21,9 +25,11 @@ usage = unlines
 -- public functions
 
 main :: IO ()
-main = getArgs >>= runApp
+main = runReaderT (liftIO $ getArgs >>= runApp) env
 
 -- private functions
+
+env = Env
 
 runApp :: [String] -> IO ()
 runApp ["serve",port] = webServer $ read port
