@@ -8,3 +8,4 @@
              all user in #general every friday morning at 8:50am
 * `vote`   - call for a vote which is broadcast to all users of a channel
              and which is resolved in five minutes
+* `anon`   - pass a message through haskbot, delivering it anonymously
