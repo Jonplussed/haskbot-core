@@ -14,14 +14,14 @@ import Web.Scotty (ActionM, param)
 
 import Slack.Types
 
-data SlashCom = SlashCom { token       :: Token
-                         , teamID      :: TeamID
-                         , channelID   :: ChannelID
-                         , channelName :: ChannelName
-                         , userID      :: UserID
-                         , userName    :: UserName
-                         , command     :: Command
-                         , text        :: T.Text
+data SlashCom = SlashCom { token       :: {-# UNPACK #-} !Token
+                         , teamID      :: {-# UNPACK #-} !TeamID
+                         , channelID   :: {-# UNPACK #-} !ChannelID
+                         , channelName :: {-# UNPACK #-} !ChannelName
+                         , userID      :: {-# UNPACK #-} !UserID
+                         , userName    :: {-# UNPACK #-} !UserName
+                         , command     :: {-# UNPACK #-} !Command
+                         , text        :: {-# UNPACK #-} !T.Text
                          } deriving (Eq, Show)
 
 -- public functions

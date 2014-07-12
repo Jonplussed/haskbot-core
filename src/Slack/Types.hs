@@ -30,8 +30,8 @@ newtype UserID      = UserID      { getUserID   :: T.Text } deriving (Eq, Show)
 newtype UserName    = UserName    { getUserName :: T.Text } deriving (Eq, Show)
 newtype Command     = Command     { getCommand  :: T.Text } deriving (Eq, Show)
 
-data Channel = DirectMsg UserName
-             | Channel ChannelName
+data Channel = DirectMsg {-# UNPACK #-} !UserName
+             | Channel   {-# UNPACK #-} !ChannelName
              deriving (Eq, Show)
 
 -- constants

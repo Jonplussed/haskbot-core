@@ -10,8 +10,8 @@ import Web.Scotty (ActionM)
 import qualified Connection.MemStore as M
 import Slack.Types
 
-data Incoming = Incoming { incChan :: Channel
-                         , incText :: Text
+data Incoming = Incoming { incChan ::                !Channel
+                         , incText :: {-# UNPACK #-} !Text
                          } deriving (Eq, Show)
 
 instance ToJSON Incoming where

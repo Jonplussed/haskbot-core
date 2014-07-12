@@ -28,10 +28,10 @@ type TokenStr  = Text
 data Reply = ViaHaskbot Incoming
            | NoReply
 
-data Plugin = Plugin { plCommand  :: Command
-                     , plHelpText :: Text
-                     , plHandler  :: HandlerFn
-                     , plToken    :: Token
+data Plugin = Plugin { plCommand  :: {-# UNPACK #-} !Command
+                     , plHelpText :: {-# UNPACK #-} !Text
+                     , plHandler  ::                !HandlerFn
+                     , plToken    :: {-# UNPACK #-} !Token
                      }
 
 apply :: Plugin -> SlashCom -> IO ()
