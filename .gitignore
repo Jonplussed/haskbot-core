@@ -12,3 +12,6 @@ dist
 # sandbox configs should be instance-specific
 .cabal-sandbox
 cabal.sandbox.config
+
+# these can contain secret keys or other sensitive data
+src/Config.hs
