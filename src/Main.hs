@@ -5,33 +5,37 @@ module Main
 import Control.Monad.Reader
 import System.Environment (getArgs)
 
-import Application.TaskRunner (taskRunner)
-import Application.WebServer (webServer)
-import Connection.MemStore (connection)
+import qualified App.MemStore as M
 
-data Env = Env
+import App.Environment (Environment (..))
+import App.TaskRunner (taskRunner)
+import App.WebServer (webServer)
 
 -- constants
 
 usage :: String
 usage = unlines
-  [ "a haskell-based chatbot"
-  , ""
-  , "USAGE:"
-  , "haskbot serve PORT - run as webserver listening on the specified PORT"
-  , "haskbot task NAME  - run a one-off task of the given NAME"
-  ]
+    [ "a Haskell-based Slack chatbot"
+    , ""
+    , "USAGE:"
+    , "haskbot serve PORT - run as webserver listening on the specified PORT"
+    , "haskbot task NAME  - run a one-off task of the given NAME"
+    ]
 
 -- public functions
 
 main :: IO ()
-main = runReaderT (liftIO $ getArgs >>= runApp) env
+main = getArgs >>= runAppAs
 
 -- private functions
 
-env = Env
+runAppAs :: [String] -> IO ()
+runAppAs ["serve",port] = bootstrap . webServer $ read port
+runAppAs ("task":tasks) = bootstrap $ taskRunner tasks
+runAppAs _              = error usage
 
-runApp :: [String] -> IO ()
-runApp ["serve",port] = webServer $ read port
-runApp ("task":tasks) = taskRunner tasks
-runApp _              = error usage
+bootstrap :: IO () -> IO ()
+bootstrap runAs = do
+    memStore <- M.connection
+    let env = Environment memStore
+    runReaderT (liftIO runAs) env

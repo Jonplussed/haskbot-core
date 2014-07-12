@@ -1,4 +1,4 @@
-module Connection.Network where
+module App.Network where
 
 -- constants
 

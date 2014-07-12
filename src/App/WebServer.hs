@@ -1,12 +1,13 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Application.WebServer (webServer) where
+module App.WebServer (webServer) where
 
-import Control.Monad.IO.Class (liftIO)
+import Control.Monad.Reader (liftIO)
 
 import Network.HTTP.Types.Status (badRequest400, unauthorized401)
 import qualified Web.Scotty as S
 
+import App.Environment (Haskbot)
 import Registry
 import Slack.Plugin
 import Slack.SlashCom
@@ -14,12 +15,12 @@ import Slack.Types
 
 -- public functions
 
-webServer :: Int -> IO ()
-webServer port = S.scotty port . S.post "/slack" $ fromParams >>= applyPlugin
+webServer :: Int -> Haskbot ()
+webServer port = liftIO $ S.scotty port . S.post "/slack" $ fromParams >>= applyPlugin
 
 -- private functions
 
-applyPlugin :: SlashCom -> S.ActionM ()
+applyPlugin :: SlashCom -> IO ()
 applyPlugin slashCom =
   case selectFrom registry (command slashCom) of
     Just plugin ->

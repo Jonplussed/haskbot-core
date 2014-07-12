@@ -1,4 +1,4 @@
-module Application.TaskRunner (taskRunner) where
+module App.TaskRunner (taskRunner) where
 
 -- public functions
 
