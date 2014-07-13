@@ -12,7 +12,7 @@ module App.MemStore
 ) where
 
 import Control.Applicative ((<$>))
-import Control.Monad.Reader
+import Control.Monad.Reader (ask, lift, liftIO)
 import qualified Data.ByteString.Char8 as BS
 import qualified Data.ByteString.Lazy as BL
 import qualified Data.Text as T
@@ -20,7 +20,7 @@ import qualified Data.Text.Encoding as T
 
 import qualified Database.Redis as R
 
-import App.Environment (Haskbot, Environment, memStoreConn)
+import App.Environment (ActionH, memStoreConn)
 import Config (redisConnInfo)
 
 newtype Key   = Key   { fromKey'   :: BS.ByteString }
@@ -63,26 +63,26 @@ instance Valuable BL.ByteString where
 connection :: IO R.Connection
 connection = R.connect redisConnInfo
 
-get :: Key -> Haskbot (Maybe Value)
+get :: Key -> ActionH (Maybe Value)
 get (Key k) = redisConn $ R.get k >>= getValue
 
-set :: Value -> Key -> Haskbot ()
+set :: Value -> Key -> ActionH ()
 set (Value v) (Key k) = redisConn $ R.set k v >>= doNothing
 
-enqueue :: Value -> Key -> Haskbot ()
+enqueue :: Value -> Key -> ActionH ()
 enqueue (Value v) (Key k) = redisConn $ R.rpush k [v] >>= doNothing
 
-dequeue :: Key -> Haskbot (Maybe Value)
+dequeue :: Key -> ActionH (Maybe Value)
 dequeue (Key k) = redisConn $ R.lpop k >>= getValue
 
-destroyAll :: Haskbot ()
+destroyAll :: ActionH ()
 destroyAll = redisConn $ R.flushdb >>= doNothing
 
 -- private functions
 
-redisConn :: R.Redis a -> Haskbot a
+redisConn :: R.Redis a -> ActionH a
 redisConn comm = do
-    env <- ask
+    env <- lift ask
     liftIO $ R.runRedis (memStoreConn env) comm
 
 onSuccess :: (a -> b) -> Either R.Reply a -> R.Redis b

@@ -2,10 +2,10 @@ module Config
 ( redisConnInfo
 ) where
 
-import Database.Redis
+import qualified Database.Redis as R
 
 -- see https://hackage.haskell.org/package/hedis-0.6.5/docs/Database-Redis.html
 -- for full ConnectInfo implementation details
 
-redisConnInfo :: ConnectInfo
-redisConnInfo = defaultConnectInfo { connectDatabase = 1 }
+redisConnInfo :: R.ConnectInfo
+redisConnInfo = R.defaultConnectInfo { R.connectDatabase = 1 }

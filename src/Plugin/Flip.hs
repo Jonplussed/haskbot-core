@@ -6,8 +6,8 @@ import Data.Char (toLower)
 import qualified Data.Map as M
 import qualified Data.Text as T
 
+import Slack.SlashCom (replySameChan, text)
 import Slack.Plugin
-import Slack.SlashCom
 
 -- constants
 

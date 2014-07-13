@@ -16,14 +16,14 @@ module Slack.Plugin
 import Data.List (find)
 import Data.Text (Text)
 
-import App.Environment (Haskbot)
+import App.Environment (ActionH)
 import Slack.SlashCom (SlashCom, command, token)
-import Slack.Types
+import Slack.Types (Channel, Command, Token, setCommand, setToken)
 import Slack.Incoming (Incoming (..), enqueue)
 
 type NameStr   = Text
 type HelpStr   = Text
-type HandlerFn = SlashCom -> Haskbot Reply
+type HandlerFn = SlashCom -> ActionH Reply
 type TokenStr  = Text
 
 data Reply = ViaHaskbot Incoming
@@ -35,7 +35,7 @@ data Plugin = Plugin { plCommand  :: {-# UNPACK #-} !Command
                      , plToken    :: {-# UNPACK #-} !Token
                      }
 
-apply :: Plugin -> SlashCom -> Haskbot ()
+apply :: Plugin -> SlashCom -> ActionH ()
 apply plugin slashCom = do
   reply <- plHandler plugin slashCom
   case reply of

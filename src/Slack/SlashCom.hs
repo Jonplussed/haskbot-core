@@ -10,8 +10,9 @@ module Slack.SlashCom
 import Control.Applicative ((<$>), (<*>))
 import qualified Data.Text as T
 
-import Web.Scotty (ActionM, param)
+import Web.Scotty.Trans (param)
 
+import App.Environment (ActionH)
 import Slack.Types
 
 data SlashCom = SlashCom { token       :: {-# UNPACK #-} !Token
@@ -26,7 +27,7 @@ data SlashCom = SlashCom { token       :: {-# UNPACK #-} !Token
 
 -- public functions
 
-fromParams :: ActionM SlashCom
+fromParams :: ActionH SlashCom
 fromParams = newSlashCom <$> param "token"
                          <*> param "team_id"
                          <*> param "channel_id"

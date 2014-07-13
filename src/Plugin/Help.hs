@@ -8,10 +8,10 @@ module Plugin.Help
 import Data.List (find)
 import qualified Data.Text as T
 
-import Registry
+import Registry (registry)
+import Slack.SlashCom (replyViaDM, text)
+import Slack.Types (getCommand, setCommand)
 import Slack.Plugin
-import Slack.SlashCom
-import Slack.Types
 
 -- constants
 

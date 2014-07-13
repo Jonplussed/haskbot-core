@@ -4,10 +4,11 @@ module Plugin.Status (register) where
 
 import qualified Data.Text as T
 
-import Connection.MemStore
+import App.Environment (ActionH)
+import App.MemStore (Key, fromValue, get, set, toKey, toValue)
+import Slack.SlashCom (SlashCom, replyViaDM, text, userName)
+import Slack.Types (UserName, getUserName, getAtUserName, setUserName)
 import Slack.Plugin
-import Slack.SlashCom
-import Slack.Types
 
 -- constants
 
@@ -38,7 +39,7 @@ handler slashCom =
 statusKey :: UserName -> Key
 statusKey user = toKey . T.append "status-" $ getUserName user
 
-getStatus :: T.Text -> IO T.Text
+getStatus :: T.Text -> ActionH T.Text
 getStatus name = do
     let user = setUserName name
     val <- get (statusKey user)
@@ -46,7 +47,7 @@ getStatus name = do
       Just st -> T.unwords [getAtUserName user, "is", fromValue st]
       Nothing -> noStatus user
 
-setStatus :: SlashCom -> IO ()
+setStatus :: SlashCom -> ActionH ()
 setStatus slashCom = set value key
   where
     key   = statusKey $ userName slashCom
