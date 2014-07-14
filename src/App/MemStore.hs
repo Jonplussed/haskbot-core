@@ -20,7 +20,7 @@ import qualified Data.Text.Encoding as T
 
 import qualified Database.Redis as R
 
-import App.Environment (ActionH, memStoreConn)
+import App.Environment (Haskbot, memStoreConn)
 import Config (redisConnInfo)
 
 newtype Key   = Key   { fromKey'   :: BS.ByteString }
@@ -63,26 +63,26 @@ instance Valuable BL.ByteString where
 connection :: IO R.Connection
 connection = R.connect redisConnInfo
 
-get :: Key -> ActionH (Maybe Value)
+get :: Key -> Haskbot (Maybe Value)
 get (Key k) = redisConn $ R.get k >>= getValue
 
-set :: Value -> Key -> ActionH ()
+set :: Value -> Key -> Haskbot ()
 set (Value v) (Key k) = redisConn $ R.set k v >>= doNothing
 
-enqueue :: Value -> Key -> ActionH ()
+enqueue :: Value -> Key -> Haskbot ()
 enqueue (Value v) (Key k) = redisConn $ R.rpush k [v] >>= doNothing
 
-dequeue :: Key -> ActionH (Maybe Value)
+dequeue :: Key -> Haskbot (Maybe Value)
 dequeue (Key k) = redisConn $ R.lpop k >>= getValue
 
-destroyAll :: ActionH ()
+destroyAll :: Haskbot ()
 destroyAll = redisConn $ R.flushdb >>= doNothing
 
 -- private functions
 
-redisConn :: R.Redis a -> ActionH a
+redisConn :: R.Redis a -> Haskbot a
 redisConn comm = do
-    env <- lift ask
+    env <- ask
     liftIO $ R.runRedis (memStoreConn env) comm
 
 onSuccess :: (a -> b) -> Either R.Reply a -> R.Redis b

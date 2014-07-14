@@ -13,6 +13,7 @@ module Slack.Plugin
 , viaHaskbot
 ) where
 
+import Control.Monad.Reader (lift)
 import Data.List (find)
 import Data.Text (Text)
 
@@ -39,7 +40,7 @@ apply :: Plugin -> SlashCom -> ActionH ()
 apply plugin slashCom = do
   reply <- plHandler plugin slashCom
   case reply of
-    ViaHaskbot incoming -> enqueue incoming
+    ViaHaskbot incoming -> (lift enqueue) incoming
     _                   -> return ()
 
 isAuthorized :: Plugin -> SlashCom -> Bool

@@ -1,14 +1,15 @@
+{-# LANGUAGE OverloadedStrings #-}
+
 module App.Network where
+
+import Data.Text (Text)
 
 -- constants
 
-asJson :: String
-asJson = "application/json"
+typeJSON :: Text
+typeJSON = "application/json"
 
-slackUrl :: String
-slackUrl = "https://bendyworks.slack.com/services/hooks/incoming-webhook"
+-- public functions
 
--- private functions
-
-slackUrlWithToken :: String -> String
-slackUrlWithToken t = slackUrl ++ "?token=" ++ t
+sendAsJSON :: Text -> Text -> IO ()
+sendAsJSON url content = return ()

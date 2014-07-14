@@ -5,17 +5,22 @@ module Slack.Incoming
 , enqueue
 ) where
 
-import Data.Text (Text)
+import Control.Concurrent (threadDelay)
+import Control.Monad (forever)
+import Control.Monad.Reader (liftIO)
+import qualified Data.Text as T
 
 import Data.Aeson (ToJSON, Object, (.=), encode, object, toJSON)
 import Web.Scotty (ActionM)
 
-import App.Environment (ActionH)
-import qualified App.MemStore as M
+import App.Environment (Haskbot)
+import App.MemStore (Key, dequeue, enqueue, fromValue, toKey, toValue)
+import App.Network (sendAsJSON)
+import Config (slackIncomingToken)
 import Slack.Types (Channel, getAddress)
 
 data Incoming = Incoming { incChan ::                !Channel
-                         , incText :: {-# UNPACK #-} !Text
+                         , incText :: {-# UNPACK #-} !T.Text
                          } deriving (Eq, Show)
 
 instance ToJSON Incoming where
@@ -25,17 +30,30 @@ instance ToJSON Incoming where
 
 -- constants
 
-queueKey :: M.Key
-queueKey = M.toKey ("incoming-queue" :: Text)
+queueKey :: Key
+queueKey = toKey ("incoming-queue" :: T.Text)
+
+timeBetweenSends :: Int
+timeBetweenSends = 1000000
+
+sendURL :: T.Text
+sendURL = T.concat
+  [ "https://bendyworks.slack.com/services/hooks/incoming-webhook"
+  , "?token="
+  , slackIncomingToken
+  ]
 
 -- public functions
 
-enqueue :: Incoming -> ActionH ()
-enqueue inc = M.enqueue value queueKey
-  where value = M.toValue . encode $ toJSON inc
+addToSendQueue :: Incoming -> Haskbot ()
+addToSendQueue inc = enqueue value queueKey
+  where value = toValue . encode $ toJSON inc
 
---dequeue :: ActionM ()
---dequeue = M.dequeue queueKey >> sendToSlack
-
---sendToSlack :: M.Value -> ActionM ()
---sendToSlack (Value v) =
+sendIncoming :: Haskbot ()
+sendIncoming =
+  forever $ do
+      outbound <- dequeue queueKey
+      case outbound of
+        Just json -> liftIO . sendAsJSON sendURL $ fromValue json
+        _         -> return ()
+      liftIO $ threadDelay timeBetweenSends
