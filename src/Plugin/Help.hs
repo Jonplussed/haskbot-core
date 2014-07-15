@@ -16,7 +16,7 @@ import Slack.Plugin
 -- constants
 
 name :: NameStr
-name = "help"
+name = "helpme"
 
 helpText :: HelpStr
 helpText =
@@ -48,7 +48,7 @@ listAllText =
   T.concat [ "Available commands: "
            , T.intercalate ", " (map pluginName registry)
            , ". To get help for a specific command,\
-             \ use `/haskbot help [command]`."
+             \ use `/helpme [command]`."
            ]
   where
-    pluginName p = T.concat ["`", getCommand (plCommand p), "`"]
+    pluginName p = T.concat ["`/", getCommand (plCommand p), "`"]
