@@ -2,7 +2,8 @@
 
 module Slack.Incoming
 ( Incoming (..)
-, enqueue
+, addToSendQueue
+, sendIncoming
 ) where
 
 import Control.Concurrent (threadDelay)

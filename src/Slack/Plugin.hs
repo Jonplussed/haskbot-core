@@ -13,18 +13,17 @@ module Slack.Plugin
 , viaHaskbot
 ) where
 
-import Control.Monad.Reader (lift)
 import Data.List (find)
 import Data.Text (Text)
 
-import App.Environment (ActionH)
+import App.Environment (Haskbot)
 import Slack.SlashCom (SlashCom, command, token)
 import Slack.Types (Channel, Command, Token, setCommand, setToken)
-import Slack.Incoming (Incoming (..), enqueue)
+import Slack.Incoming (Incoming (..), addToSendQueue)
 
 type NameStr   = Text
 type HelpStr   = Text
-type HandlerFn = SlashCom -> ActionH Reply
+type HandlerFn = SlashCom -> Haskbot Reply
 type TokenStr  = Text
 
 data Reply = ViaHaskbot Incoming
@@ -36,12 +35,12 @@ data Plugin = Plugin { plCommand  :: {-# UNPACK #-} !Command
                      , plToken    :: {-# UNPACK #-} !Token
                      }
 
-apply :: Plugin -> SlashCom -> ActionH ()
+apply :: Plugin -> SlashCom -> Haskbot ()
 apply plugin slashCom = do
-  reply <- plHandler plugin slashCom
-  case reply of
-    ViaHaskbot incoming -> (lift enqueue) incoming
-    _                   -> return ()
+    reply <- plHandler plugin slashCom
+    case reply of
+      ViaHaskbot incoming -> addToSendQueue incoming
+      _                   -> return ()
 
 isAuthorized :: Plugin -> SlashCom -> Bool
 isAuthorized plugin slashCom = plToken plugin == token slashCom

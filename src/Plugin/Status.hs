@@ -4,7 +4,7 @@ module Plugin.Status (register) where
 
 import qualified Data.Text as T
 
-import App.Environment (ActionH)
+import App.Environment (Haskbot)
 import App.MemStore (Key, fromValue, get, set, toKey, toValue)
 import Slack.SlashCom (SlashCom, replyViaDM, text, userName)
 import Slack.Types (UserName, getUserName, getAtUserName, setUserName)
@@ -39,7 +39,7 @@ handler slashCom =
 statusKey :: UserName -> Key
 statusKey user = toKey . T.append "status-" $ getUserName user
 
-getStatus :: T.Text -> ActionH T.Text
+getStatus :: T.Text -> Haskbot T.Text
 getStatus name = do
     let user = setUserName name
     val <- get (statusKey user)
@@ -47,7 +47,7 @@ getStatus name = do
       Just st -> T.unwords [getAtUserName user, "is", fromValue st]
       Nothing -> noStatus user
 
-setStatus :: SlashCom -> ActionH ()
+setStatus :: SlashCom -> Haskbot ()
 setStatus slashCom = set value key
   where
     key   = statusKey $ userName slashCom

@@ -1,10 +1,10 @@
 module App.Environment
 ( Haskbot
-, ScottyH
 , ActionH
+, ScottyH
 , Environment (..)
-, getEnv
-, getTimestamp
+, appEnv
+, appTime
 ) where
 
 import Control.Monad.Reader (ReaderT)
@@ -13,7 +13,7 @@ import qualified Data.Text as T
 import qualified Data.Text.Lazy as TL
 
 import qualified Database.Redis as R
-import Web.Scotty.Trans (ScottyT, ActionT)
+import Web.Scotty.Trans (ActionT, ScottyT)
 
 import Config (redisConnInfo)
 
@@ -25,8 +25,8 @@ data Environment = Environment { memStoreConn :: !R.Connection }
 
 -- public functions
 
-getEnv :: IO Environment
-getEnv =  R.connect redisConnInfo >>= return . Environment
+appEnv :: IO Environment
+appEnv =  R.connect redisConnInfo >>= return . Environment
 
-getTimestamp :: IO T.Text
-getTimestamp = getPOSIXTime >>= return . T.pack . show . truncate . (* 1000000)
+appTime :: IO T.Text
+appTime = getPOSIXTime >>= return . T.pack . show . truncate . (* 1000000)

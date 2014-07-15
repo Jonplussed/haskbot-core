@@ -3,13 +3,13 @@
 module App.WebServer (webServer) where
 
 import Control.Concurrent (forkIO)
-import Control.Monad.Reader (liftIO, runReaderT)
-import Data.Text.Lazy (Text, fromStrict)
+import Control.Monad.Reader (lift, liftIO, runReaderT)
+import Data.Text.Lazy (fromStrict)
 
 import Network.HTTP.Types.Status (badRequest400, unauthorized401)
-import qualified Web.Scotty.Trans as S
+import Web.Scotty.Trans (get, post, scottyT, status, text)
 
-import App.Environment (ActionH, ScottyH, getEnv, getTimestamp)
+import App.Environment (ActionH, ScottyH, appEnv, appTime)
 import Registry (registry)
 import Slack.Incoming (sendIncoming)
 import Slack.Plugin (apply, isAuthorized, selectFrom)
@@ -19,10 +19,10 @@ import Slack.SlashCom (SlashCom, command, fromParams)
 
 webServer :: Int -> IO ()
 webServer port = do
-    env <- getEnv
+    env <- appEnv
     let haskbot r = runReaderT r env
     forkIO $ haskbot sendIncoming
-    S.scottyT port haskbot haskbot routes
+    scottyT port haskbot haskbot routes
 
 -- private functions
 
@@ -31,14 +31,14 @@ applyPlugin slashCom =
   case selectFrom registry (command slashCom) of
     Just plugin ->
       if isAuthorized plugin slashCom
-      then apply plugin slashCom    >> S.text "200 OK"
-      else S.status unauthorized401 >> S.text "401 Unauthorized"
-    _ -> S.status badRequest400     >> S.text "400 Bad Request"
+      then lift (apply plugin slashCom) >> text "200 OK"
+      else status unauthorized401       >> text "401 Unauthorized"
+    _ -> status badRequest400           >> text "400 Bad Request"
 
 routes :: ScottyH ()
 routes = do
-    S.post "/slack" $ fromParams >>= applyPlugin
-    S.get  "/ping"  $ timestamp
+    post "/slack" $ fromParams >>= applyPlugin
+    get  "/ping"  $ timestamp
 
 timestamp :: ActionH ()
-timestamp = liftIO getTimestamp >>= S.text . fromStrict
+timestamp = liftIO appTime >>= text . fromStrict
