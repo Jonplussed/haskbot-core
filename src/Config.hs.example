@@ -1,11 +1,21 @@
+{-# LANGUAGE OverloadedStrings #-}
+
 module Config
-( redisConnInfo
+( getRedisInfo
+, slackIncomingToken
 ) where
+
+import Data.Text (Text)
+import System.Environment (getEnv)
 
 import qualified Database.Redis as R
 
--- see https://hackage.haskell.org/package/hedis-0.6.5/docs/Database-Redis.html
--- for full ConnectInfo implementation details
+slackIncomingToken :: Text
+slackIncomingToken = "slack_incoming_token"
 
-redisConnInfo :: R.ConnectInfo
-redisConnInfo = R.defaultConnectInfo { R.connectDatabase = 1 }
+getRedisInfo :: IO R.ConnectInfo
+getRedisInfo = do
+  env <- getEnv "HASKBOT_ENV"
+  return $ case env of
+    "test" -> R.defaultConnectInfo { R.connectDatabase = 0 }
+    _      -> R.defaultConnectInfo { R.connectDatabase = 1 }

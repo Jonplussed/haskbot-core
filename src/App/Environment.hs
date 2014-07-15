@@ -15,7 +15,7 @@ import qualified Data.Text.Lazy as TL
 import qualified Database.Redis as R
 import Web.Scotty.Trans (ActionT, ScottyT)
 
-import Config (redisConnInfo)
+import Config (getRedisInfo)
 
 type Haskbot = ReaderT Environment IO
 type ScottyH = ScottyT TL.Text Haskbot
@@ -26,7 +26,9 @@ data Environment = Environment { memStoreConn :: !R.Connection }
 -- public functions
 
 appEnv :: IO Environment
-appEnv =  R.connect redisConnInfo >>= return . Environment
+appEnv = getRedisInfo >>= R.connect >>= return . Environment
 
 appTime :: IO T.Text
 appTime = getPOSIXTime >>= return . T.pack . show . truncate . (* 1000000)
+
+-- private functions
