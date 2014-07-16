@@ -1,14 +1,15 @@
+{-# LANGUAGE OverloadedStrings #-}
+
 module App.MemStore
 ( Key
 , Keyable (..)
 , Value
 , Valuable (..)
-, connection
 , get
 , set
 , enqueue
 , dequeue
-, destroyAll
+, flushDB
 ) where
 
 import Control.Applicative ((<$>))
@@ -21,7 +22,6 @@ import qualified Data.Text.Encoding as T
 import qualified Database.Redis as R
 
 import App.Environment (Haskbot, memStoreConn)
-import Config (redisConnInfo)
 
 newtype Key   = Key   { fromKey'   :: BS.ByteString }
 newtype Value = Value { fromValue' :: BS.ByteString }
@@ -32,15 +32,15 @@ class Keyable a where
 
 instance Keyable T.Text where
   toKey   = Key . T.encodeUtf8
-  fromKey = T.decodeUtf8 . fromKey'
+  fromKey = T.decodeUtf8 . fromKeyWithPre
 
 instance Keyable BS.ByteString where
-  toKey           = Key
-  fromKey (Key x) = x
+  toKey   = Key
+  fromKey = fromKeyWithPre
 
 instance Keyable BL.ByteString where
   toKey   = Key . BL.toStrict
-  fromKey = BL.fromStrict . fromKey'
+  fromKey = BL.fromStrict . fromKeyWithPre
 
 class Valuable a where
   toValue   :: a -> Value
@@ -58,25 +58,33 @@ instance Valuable BL.ByteString where
   toValue   = Value . BL.toStrict
   fromValue = BL.fromStrict . fromValue'
 
+-- constants
+
+keyPrefix :: BS.ByteString
+keyPrefix = "haskbot-"
+
+errorMsg :: String
+errorMsg = "connection to Redis server failed"
+
 -- public functions
 
-connection :: IO R.Connection
-connection = R.connect redisConnInfo
-
 get :: Key -> Haskbot (Maybe Value)
-get (Key k) = redisConn $ R.get k >>= getValue
+get key = redisConn $ R.get (fromKey key) >>= getValue
+
+del :: Key -> Haskbot ()
+del key = redisConn $ R.del [fromKey key] >>= doNothing
 
 set :: Value -> Key -> Haskbot ()
-set (Value v) (Key k) = redisConn $ R.set k v >>= doNothing
+set (Value v) key = redisConn $ R.set (fromKey key) v >>= doNothing
+
+dequeue :: Key -> Haskbot (Maybe Value)
+dequeue key = redisConn $ R.lpop (fromKey key) >>= getValue
 
 enqueue :: Value -> Key -> Haskbot ()
 enqueue (Value v) (Key k) = redisConn $ R.rpush k [v] >>= doNothing
 
-dequeue :: Key -> Haskbot (Maybe Value)
-dequeue (Key k) = redisConn $ R.lpop k >>= getValue
-
-destroyAll :: Haskbot ()
-destroyAll = redisConn $ R.flushdb >>= doNothing
+flushDB :: Haskbot ()
+flushDB = redisConn $ R.flushdb >>= doNothing
 
 -- private functions
 
@@ -88,7 +96,7 @@ redisConn comm = do
 onSuccess :: (a -> b) -> Either R.Reply a -> R.Redis b
 onSuccess f status =
   case status of
-    Left _    -> fail "connection to Redis server failed"
+    Left _    -> fail errorMsg
     Right val -> return $ f val
 
 doNothing :: Either R.Reply a -> R.Redis ()
@@ -96,3 +104,6 @@ doNothing = onSuccess $ \_ -> ()
 
 getValue :: Either R.Reply (Maybe BS.ByteString) -> R.Redis (Maybe Value)
 getValue  = onSuccess $ \v -> Value <$> v
+
+fromKeyWithPre :: Key -> BS.ByteString
+fromKeyWithPre = BS.append keyPrefix . fromKey'
