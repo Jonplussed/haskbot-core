@@ -1,4 +1,4 @@
-{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE OverloadedStrings, FlexibleInstances #-}
 
 module App.MemStore
 ( Key
@@ -42,6 +42,10 @@ instance Keyable BL.ByteString where
   toKey   = Key . BL.toStrict
   fromKey = BL.fromStrict . fromKeyWithPre
 
+instance Keyable String where
+  toKey   = Key . BS.pack
+  fromKey = BS.unpack . fromKeyWithPre
+
 class Valuable a where
   toValue   :: a -> Value
   fromValue :: Value -> a
@@ -57,6 +61,10 @@ instance Valuable BS.ByteString where
 instance Valuable BL.ByteString where
   toValue   = Value . BL.toStrict
   fromValue = BL.fromStrict . fromValue'
+
+instance Valuable String where
+  toValue   = Value . BS.pack
+  fromValue = BS.unpack . fromValue'
 
 -- constants
 
@@ -96,7 +104,7 @@ redisConn comm = do
 onSuccess :: (a -> b) -> Either R.Reply a -> R.Redis b
 onSuccess f status =
   case status of
-    Left _    -> fail errorMsg
+    Left _    -> fail errorMsg -- this should log a failure
     Right val -> return $ f val
 
 doNothing :: Either R.Reply a -> R.Redis ()
