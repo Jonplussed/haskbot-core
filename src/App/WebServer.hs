@@ -11,7 +11,7 @@ import Web.Scotty.Trans (get, post, scottyT, status, text)
 
 import App.Environment (ActionH, ScottyH, appEnv, appTime)
 import Registry (registry)
-import Slack.Incoming (sendIncoming)
+import Slack.Incoming (sendFromQueue)
 import Slack.Plugin (apply, isAuthorized, selectFrom)
 import Slack.SlashCom (SlashCom, command, fromParams)
 
@@ -21,7 +21,7 @@ webServer :: Int -> IO ()
 webServer port = do
     env <- appEnv
     let haskbot r = runReaderT r env
-    forkIO $ haskbot sendIncoming
+    forkIO $ haskbot sendFromQueue
     scottyT port haskbot haskbot routes
 
 -- private functions
