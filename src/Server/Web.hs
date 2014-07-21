@@ -1,25 +1,24 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module App.WebServer (webServer) where
+module Server.Web (webServer) where
 
 import Control.Concurrent (forkIO)
 import Control.Monad.Reader (lift, liftIO, runReaderT)
-import Data.Text.Lazy (fromStrict)
+import Data.Text.Lazy (Text, fromStrict)
 
 import Network.HTTP.Types.Status (badRequest400, unauthorized401)
 import Web.Scotty.Trans (get, post, scottyT, status, text)
 
-import App.Environment (ActionH, ScottyH, appEnv, appTime)
-import Registry (registry)
+import Server.Environment (ActionH, ScottyH, getAppEnv, getAppTime)
+import Server.Plugin (apply, isAuthorized, selectFrom)
 import Slack.Incoming (sendFromQueue)
-import Slack.Plugin (apply, isAuthorized, selectFrom)
 import Slack.SlashCom (SlashCom, command, fromParams)
 
 -- public functions
 
 webServer :: Int -> IO ()
 webServer port = do
-    env <- appEnv
+    env <- getAppEnv
     let haskbot r = runReaderT r env
     forkIO $ haskbot sendFromQueue
     scottyT port haskbot haskbot routes
@@ -41,4 +40,4 @@ routes = do
     get  "/ping"  $ timestamp
 
 timestamp :: ActionH ()
-timestamp = liftIO appTime >>= text . fromStrict
+timestamp = liftIO getAppTime >>= text . fromStrict

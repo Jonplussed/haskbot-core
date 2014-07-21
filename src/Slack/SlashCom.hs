@@ -9,10 +9,11 @@ module Slack.SlashCom
 
 import Control.Applicative ((<$>), (<*>))
 import qualified Data.Text as T
+import qualified Data.Text.Lazy as TL
 
-import Web.Scotty.Trans (param)
+import Web.Scotty.Trans (ActionT, param)
 
-import App.Environment (ActionH)
+import Server.Environment (Haskbot)
 import Slack.Types
 
 data SlashCom = SlashCom { token       :: {-# UNPACK #-} !Token
