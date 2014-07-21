@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Server.Web (webServer) where
+module Haskbot.Server (webServer) where
 
 import Control.Concurrent (forkIO)
 import Control.Monad.Reader (lift, liftIO, runReaderT)
@@ -9,8 +9,8 @@ import Data.Text.Lazy (Text, fromStrict)
 import Network.HTTP.Types.Status (badRequest400, unauthorized401)
 import Web.Scotty.Trans (get, post, scottyT, status, text)
 
-import Server.Environment (ActionH, ScottyH, getAppEnv, getAppTime)
-import Server.Plugin (apply, isAuthorized, selectFrom)
+import Haskbot.Environment (ActionH, ScottyH, getAppEnv, getAppTime)
+import Haskbot.Plugin (apply, isAuthorized, selectFrom)
 import Slack.Incoming (sendFromQueue)
 import Slack.SlashCom (SlashCom, command, fromParams)
 

@@ -11,9 +11,9 @@ import Control.Applicative ((<$>), (<*>))
 import qualified Data.Text as T
 import qualified Data.Text.Lazy as TL
 
-import Web.Scotty.Trans (ActionT, param)
+import Web.Scotty.Trans (param)
 
-import Server.Environment (Haskbot)
+import Haskbot.Environment (ActionH, Haskbot)
 import Slack.Types
 
 data SlashCom = SlashCom { token       :: {-# UNPACK #-} !Token

@@ -19,8 +19,12 @@ import Data.Aeson (ToJSON, Object, (.=), encode, object, toJSON)
 import Network.HTTP.Conduit -- basically everything
 import Network.HTTP.Types (Header, methodPost, status200)
 
-import Server.Environment (Haskbot, getSlackToken, incQueue, networkConn)
-import Slack.Types (Channel, Incoming, getAddress)
+import Haskbot.Environment (Haskbot, getSlackToken, incQueue, networkConn)
+import Slack.Types (Channel, getAddress)
+
+data Incoming = Incoming { incChan ::                !Channel
+                         , incText :: {-# UNPACK #-} !Text
+                         } deriving (Eq, Show)
 
 instance ToJSON Incoming where
   toJSON inc = object [ "channel" .= getAddress (incChan inc)

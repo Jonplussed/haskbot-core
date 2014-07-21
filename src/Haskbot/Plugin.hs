@@ -1,4 +1,4 @@
-module Server.Plugin
+module Haskbot.Plugin
 ( HandlerFn
 , HelpStr
 , NameStr
@@ -16,10 +16,10 @@ module Server.Plugin
 import Data.List (find)
 import Data.Text (Text)
 
-import Server.Environment (Haskbot)
+import Haskbot.Environment (Haskbot)
 import Slack.SlashCom (SlashCom, command, token)
-import Slack.Types (Channel, Command, Incoming, Token, setCommand, setToken)
-import Slack.Incoming (Incoming, addToSendQueue)
+import Slack.Types (Channel, Command, Token, setCommand, setToken)
+import Slack.Incoming (Incoming (Incoming), addToSendQueue)
 
 type NameStr   = Text
 type HelpStr   = Text

@@ -1,6 +1,6 @@
 {-# LANGUAGE RecordWildCards #-}
 
-module Server.Environment
+module Haskbot.Environment
 ( Haskbot
 , ActionH
 , ScottyH
@@ -22,7 +22,7 @@ import qualified Network.Connection as N
 import qualified Network.HTTP.Conduit as N
 import Web.Scotty.Trans (ActionT, ScottyT)
 
-import Server.Plugin (Plugin)
+import Haskbot.Plugin (Plugin)
 
 type Haskbot = ReaderT Environment IO
 type ScottyH = ScottyT TL.Text Haskbot

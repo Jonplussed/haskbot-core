@@ -2,7 +2,7 @@ module Main
 ( main
 ) where
 
-import App.WebServer (webServer)
+import Server.Web (webServer)
 
 -- public functions
 
