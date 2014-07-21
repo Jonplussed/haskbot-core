@@ -9,7 +9,9 @@ module App.Environment
 , appTime
 ) where
 
+import Control.Concurrent.STM.TVar (TVar, newTVarIO)
 import Control.Monad.Reader (ReaderT)
+import qualified Data.ByteString.Lazy as BL
 import Data.Time.Clock.POSIX (getPOSIXTime)
 import qualified Data.Text as T
 import qualified Data.Text.Lazy as TL
@@ -26,6 +28,7 @@ type ActionH = ActionT TL.Text Haskbot
 
 data Environment = Environment { redisConn   :: !R.Connection
                                , networkConn :: N.Manager
+                               , incQueue    :: TVar [BL.ByteString]
                                }
 
 -- public functions
@@ -34,6 +37,7 @@ appEnv :: IO Environment
 appEnv = do
   redisConn   <- getRedisInfo >>= R.connect
   networkConn <- getNetworkInfo >>= N.newManager
+  incQueue    <- newTVarIO []
   return Environment {..}
 
 appTime :: IO T.Text

@@ -7,18 +7,19 @@ module Slack.Incoming
 ) where
 
 import Control.Concurrent (threadDelay)
+import Control.Concurrent.STM (atomically)
+import Control.Concurrent.STM.TVar (modifyTVar', readTVar)
 import Control.Monad (forever)
 import Control.Monad.Reader (ask, liftIO)
 import qualified Data.ByteString.Char8 as BS
+import qualified Data.ByteString.Lazy as BL
 import Data.Text (Text)
 
 import Data.Aeson (ToJSON, Object, (.=), encode, object, toJSON)
-import Network.HTTP.Conduit
+import Network.HTTP.Conduit -- basically everything
 import Network.HTTP.Types (Header, methodPost, status200)
-import Web.Scotty (ActionM)
 
-import App.Environment (Haskbot, networkConn)
-import App.MemStore (Key, Value, dequeue, enqueue, fromValue, toValue, toKey)
+import App.Environment (Haskbot, incQueue, networkConn)
 import App.Config (getSlackToken)
 import Slack.Types (Channel, getAddress)
 
@@ -36,9 +37,6 @@ instance ToJSON Incoming where
 jsonContentType :: Header
 jsonContentType = ("Content-Type", "application/json")
 
-queueName :: Text
-queueName = "incoming-queue"
-
 slackUrl :: String
 slackUrl = "https://bendyworks.slack.com/services/hooks/incoming-webhook"
 
@@ -48,11 +46,10 @@ timeBetweenSends = 1000000 -- Slack rate limit
 -- public functions
 
 addToSendQueue :: Incoming -> Haskbot ()
-addToSendQueue inc = enqueue value queueKey
-  where value = toValue . encode $ toJSON inc
+addToSendQueue inc = enqueueMsg . encode $ toJSON inc
 
 sendFromQueue :: Haskbot ()
-sendFromQueue = forever $ dequeue queueKey >>= sendNextMsg >> wait
+sendFromQueue = forever $ dequeueMsg >>= sendMsg >> wait
 
 -- private functions
 
@@ -67,21 +64,34 @@ incRequest = do
       , requestHeaders    = [jsonContentType]
       }
 
-queueKey :: Key
-queueKey = toKey queueName
-
-respHandler :: Value -> Response a -> Haskbot ()
-respHandler json resp
+handleResp :: BL.ByteString -> Response a -> Haskbot ()
+handleResp msg resp
   | responseStatus resp == status200 = return ()
-  | otherwise = enqueue json queueKey -- should also log failure
+  | otherwise = enqueueMsg msg -- should also log failure
 
-sendNextMsg :: Maybe Value -> Haskbot ()
-sendNextMsg (Just json) = do
+sendMsg :: Maybe BL.ByteString -> Haskbot ()
+sendMsg (Just msg) = do
     env <- ask
     template <- incRequest
-    let newRequest = template { requestBody = RequestBodyBS $ fromValue json }
-    httpLbs newRequest (networkConn env) >>= respHandler json
-sendNextMsg _ = return ()
+    let newRequest = template { requestBody = RequestBodyLBS msg }
+    httpLbs newRequest (networkConn env) >>= handleResp msg
+sendMsg _ = return ()
 
 wait :: Haskbot ()
 wait = liftIO $ threadDelay timeBetweenSends
+
+enqueueMsg :: BL.ByteString -> Haskbot ()
+enqueueMsg msg = do
+    env <- ask
+    liftIO . atomically $ modifyTVar' (incQueue env) (\q -> q ++ [msg])
+
+dequeueMsg :: Haskbot (Maybe BL.ByteString)
+dequeueMsg = do
+    env <- ask
+    liftIO . atomically $ do
+        msgs <- readTVar $ incQueue env
+        case msgs of
+          (m:ms) -> do
+            modifyTVar' (incQueue env) (\q -> tail q)
+            return $ Just m
+          _ -> return Nothing
