@@ -4,7 +4,6 @@ module Main
 
 import System.Environment (getArgs)
 
-import App.TaskRunner (taskRunner)
 import App.WebServer (webServer)
 
 -- constants
@@ -27,5 +26,4 @@ main = getArgs >>= runAppAs
 
 runAppAs :: [String] -> IO ()
 runAppAs ["serve",port] = webServer $ read port
-runAppAs ("task":tasks) = taskRunner tasks
 runAppAs _              = error usage

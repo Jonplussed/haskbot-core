@@ -18,7 +18,7 @@ import qualified Database.Redis as R
 import qualified Network.HTTP.Conduit as N
 import Web.Scotty.Trans (ActionT, ScottyT)
 
-import Config (getNetworkInfo, getRedisInfo)
+import App.Config (getNetworkInfo, getRedisInfo)
 
 type Haskbot = ReaderT Environment IO
 type ScottyH = ScottyT TL.Text Haskbot

@@ -3,7 +3,6 @@
 module Registry (registry) where
 
 import Slack.Plugin (Plugin)
-import Slack.SlashCom (SlashCom)
 import qualified Plugin.Flip as Flip
 import qualified Plugin.Status as Status
 
