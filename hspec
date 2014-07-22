@@ -1,1 +1,1 @@
-cabal build spec && HASKBOT_ENV="test" ./dist/build/spec/spec
+cabal build spec && ./dist/build/spec/spec
