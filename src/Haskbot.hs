@@ -2,10 +2,10 @@ module Haskbot
 ( haskbot
 ) where
 
-import Haskbot.Plugin (Plugin)
 import Haskbot.Server (webServer)
+import Haskbot.Slacklet (Slacklet)
 
 -- public functions
 
-haskbot :: Int -> [Plugin] -> IO ()
+haskbot :: [Slacklet] -> Int -> IO ()
 haskbot = webServer
