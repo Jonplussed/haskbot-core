@@ -1,14 +1,14 @@
-module Haskbot.Slacklet
+module Haskbot.Plugin
 ( HandlerFn
 , HelpStr
 , NameStr
-, Slacklet (..)
+, Plugin (..)
 , Reply  (..)
 , TokenStr
 , isAuthorized
-, newSlacklet
+, newPlugin
 , noReply
-, runSlacklet
+, runPlugin
 , selectFrom
 , viaHaskbot
 ) where
@@ -29,31 +29,31 @@ type TokenStr  = Text
 data Reply = ViaHaskbot Incoming
            | NoReply
 
-data Slacklet = Slacklet { slCommand  :: {-# UNPACK #-} !Command
-                         , slHelpText :: {-# UNPACK #-} !Text
-                         , slHandler  ::                !HandlerFn
-                         , slToken    :: {-# UNPACK #-} !Token
+data Plugin = Plugin { plCommand  :: {-# UNPACK #-} !Command
+                         , plHelpText :: {-# UNPACK #-} !Text
+                         , plHandler  ::                !HandlerFn
+                         , plToken    :: {-# UNPACK #-} !Token
                          }
 
-runSlacklet :: Slacklet -> SlashCom -> Haskbot ()
-runSlacklet p slashCom = do
-    reply <- slHandler p slashCom
+runPlugin :: Plugin -> SlashCom -> Haskbot ()
+runPlugin p slashCom = do
+    reply <- plHandler p slashCom
     case reply of
       ViaHaskbot incoming -> addToSendQueue incoming
       _                   -> return ()
 
-isAuthorized :: Slacklet -> SlashCom -> Bool
-isAuthorized slacklet slashCom = slToken slacklet == token slashCom
+isAuthorized :: Plugin -> SlashCom -> Bool
+isAuthorized plugin slashCom = plToken plugin == token slashCom
 
-newSlacklet :: Text -> Text -> HandlerFn -> Text -> Slacklet
-newSlacklet com help handler token =
-  Slacklet (setCommand com) help handler (setToken token)
+newPlugin :: Text -> Text -> HandlerFn -> Text -> Plugin
+newPlugin com help handler token =
+  Plugin (setCommand com) help handler (setToken token)
 
 noReply :: (Monad m) => m Reply
 noReply = return NoReply
 
-selectFrom :: [Slacklet] -> Command -> Maybe Slacklet
-selectFrom list com = find (\p -> slCommand p == com) list
+selectFrom :: [Plugin] -> Command -> Maybe Plugin
+selectFrom list com = find (\p -> plCommand p == com) list
 
 viaHaskbot :: (Monad m) => Channel -> Text -> m Reply
 viaHaskbot chan = return . ViaHaskbot . Incoming chan
