@@ -5,9 +5,9 @@ module Haskbot.Environment
 , ActionH
 , ScottyH
 , Environment (..)
-, getAppEnv
 , getAppTime
 , getSlackToken
+, setAppEnv
 ) where
 
 import Control.Concurrent.STM.TVar (TVar, newTVarIO)
@@ -40,17 +40,17 @@ tokenVar = "HASKBOT_TOKEN"
 
 -- public functions
 
-getAppEnv :: IO Environment
-getAppEnv = do
-  networkConn <- getNetworkInfo >>= N.newManager
-  incQueue    <- newTVarIO []
-  return Environment {..}
-
 getAppTime :: IO T.Text
 getAppTime = getPOSIXTime >>= return . T.pack . show . truncate . (* 1000000)
 
 getSlackToken :: IO String
 getSlackToken = getEnv tokenVar
+
+setAppEnv :: [Plugin] -> IO Environment
+setAppEnv plugins = do
+  networkConn <- getNetworkInfo >>= N.newManager
+  incQueue    <- newTVarIO []
+  return $ Environment networkConn inQueue
 
 -- private functions
 

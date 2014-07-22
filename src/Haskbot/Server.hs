@@ -16,10 +16,8 @@ import Slack.SlashCom (SlashCom, command, fromParams)
 
 -- public functions
 
-webServer :: Int -> IO ()
-webServer port = do
-    env <- getAppEnv
-    let haskbot r = runReaderT r env
+--webServer :: Int -> [Plugin] -> IO ()
+webServer haskbot port = do
     forkIO $ haskbot sendFromQueue
     scottyT port haskbot haskbot routes
 
