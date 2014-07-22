@@ -1,0 +1,13 @@
+{-# LANGUAGE OverloadedStrings #-}
+
+module Main where
+
+import Haskbot (haskbot)
+import Haskbot.Slacklet (Slacklet)
+import qualified Slacklet.Help as Help
+
+main :: IO ()
+main = haskbot slacklets 8000
+
+slacklets :: [Slacklet]
+slacklets = [ Help.register slacklets "help_secret_token" ]
