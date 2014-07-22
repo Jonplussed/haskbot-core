@@ -15,7 +15,7 @@ import qualified Data.ByteString.Char8 as BS
 import qualified Data.ByteString.Lazy as BL
 import Data.Text (Text)
 
-import Data.Aeson (ToJSON, Object, (.=), encode, object, toJSON)
+import Data.Aeson (ToJSON, (.=), encode, object, toJSON)
 import Network.HTTP.Conduit -- basically everything
 import Network.HTTP.Types (Header, methodPost, status200)
 

@@ -8,12 +8,11 @@ module Slack.SlashCom
 ) where
 
 import Control.Applicative ((<$>), (<*>))
-import qualified Data.Text as T
-import qualified Data.Text.Lazy as TL
+import Data.Text (Text)
 
 import Web.Scotty.Trans (param)
 
-import Haskbot.Environment (ActionH, Haskbot)
+import Haskbot.Environment (ActionH)
 import Slack.Types
 
 data SlashCom = SlashCom { token       :: {-# UNPACK #-} !Token
@@ -23,7 +22,7 @@ data SlashCom = SlashCom { token       :: {-# UNPACK #-} !Token
                          , userID      :: {-# UNPACK #-} !UserID
                          , userName    :: {-# UNPACK #-} !UserName
                          , command     :: {-# UNPACK #-} !Command
-                         , text        :: {-# UNPACK #-} !T.Text
+                         , text        :: {-# UNPACK #-} !Text
                          } deriving (Eq, Show)
 
 -- public functions
@@ -46,8 +45,9 @@ replyViaDM = DirectMsg . userName
 
 -- private functions
 
-newSlashCom :: T.Text -> T.Text -> T.Text -> T.Text -> T.Text -> T.Text
-            -> T.Text -> T.Text -> SlashCom
+newSlashCom :: Text -> Text -> Text -> Text
+            -> Text -> Text -> Text -> Text
+            -> SlashCom
 newSlashCom a b c d e f g =
   SlashCom (setToken a)
            (setTeamID b)

@@ -5,10 +5,10 @@ module Haskbot.Plugin
 , Plugin (..)
 , Reply  (..)
 , TokenStr
-, apply
 , isAuthorized
 , newPlugin
 , noReply
+, runPlugin
 , selectFrom
 , viaHaskbot
 ) where
@@ -17,9 +17,9 @@ import Data.List (find)
 import Data.Text (Text)
 
 import Haskbot.Environment (Haskbot)
-import Slack.SlashCom (SlashCom, command, token)
-import Slack.Types (Channel, Command, Token, setCommand, setToken)
 import Slack.Incoming (Incoming (Incoming), addToSendQueue)
+import Slack.SlashCom (SlashCom, token)
+import Slack.Types (Channel, Command, Token, setCommand, setToken)
 
 type NameStr   = Text
 type HelpStr   = Text
@@ -35,9 +35,9 @@ data Plugin = Plugin { plCommand  :: {-# UNPACK #-} !Command
                      , plToken    :: {-# UNPACK #-} !Token
                      }
 
-apply :: Plugin -> SlashCom -> Haskbot ()
-apply plugin slashCom = do
-    reply <- plHandler plugin slashCom
+runPlugin :: Plugin -> SlashCom -> Haskbot ()
+runPlugin p slashCom = do
+    reply <- plHandler p slashCom
     case reply of
       ViaHaskbot incoming -> addToSendQueue incoming
       _                   -> return ()

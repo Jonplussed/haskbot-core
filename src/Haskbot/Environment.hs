@@ -5,9 +5,9 @@ module Haskbot.Environment
 , ActionH
 , ScottyH
 , Environment (..)
+, getAppEnv
 , getAppTime
 , getSlackToken
-, setAppEnv
 ) where
 
 import Control.Concurrent.STM.TVar (TVar, newTVarIO)
@@ -22,15 +22,12 @@ import qualified Network.Connection as N
 import qualified Network.HTTP.Conduit as N
 import Web.Scotty.Trans (ActionT, ScottyT)
 
-import Haskbot.Plugin (Plugin)
-
 type Haskbot = ReaderT Environment IO
 type ScottyH = ScottyT TL.Text Haskbot
 type ActionH = ActionT TL.Text Haskbot
 
 data Environment = Environment { networkConn :: N.Manager
                                , incQueue    :: TVar [BL.ByteString]
-                               , plugins     :: [Plugin]
                                }
 
 -- constants
@@ -46,11 +43,11 @@ getAppTime = getPOSIXTime >>= return . T.pack . show . truncate . (* 1000000)
 getSlackToken :: IO String
 getSlackToken = getEnv tokenVar
 
-setAppEnv :: [Plugin] -> IO Environment
-setAppEnv plugins = do
+getAppEnv :: IO Environment
+getAppEnv = do
   networkConn <- getNetworkInfo >>= N.newManager
   incQueue    <- newTVarIO []
-  return $ Environment networkConn inQueue
+  return $ Environment {..}
 
 -- private functions
 

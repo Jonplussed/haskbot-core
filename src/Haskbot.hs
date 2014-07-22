@@ -1,13 +1,11 @@
-module Main
-( main
+module Haskbot
+( haskbot
 ) where
 
+import Haskbot.Plugin (Plugin)
 import Haskbot.Server (webServer)
 
 -- public functions
 
 haskbot :: Int -> [Plugin] -> IO ()
-haskbot port plugins = do
-    env <- getAppEnv plugins
-    let haskbot r = runReaderT r env
-    webServer haskbot port
+haskbot = webServer
