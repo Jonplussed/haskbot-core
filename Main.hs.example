@@ -3,11 +3,11 @@
 module Main where
 
 import Haskbot (haskbot)
-import Haskbot.Slacklet (Slacklet)
-import qualified Slacklet.Help as Help
+import Haskbot.Plugin (Plugin)
+import qualified Plugin.Help as Help
 
 main :: IO ()
-main = haskbot slacklets 8000
+main = haskbot plugins 8000
 
-slacklets :: [Slacklet]
-slacklets = [ Help.register slacklets "help_secret_token" ]
+plugins :: [Plugin]
+plugins = [ Help.register plugins "help_secret_token" ]
