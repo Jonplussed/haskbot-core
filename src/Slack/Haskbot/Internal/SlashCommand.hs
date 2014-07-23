@@ -1,29 +1,16 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Slack.SlashCom
+module Slack.Haskbot.Internal.SlashCommand
 ( SlashCom (..)
 , fromParams
-, replySameChan
-, replyViaDM
 ) where
 
 import Control.Applicative ((<$>), (<*>))
 import Data.Text (Text)
-
+import Slack.Haskbot.Internal.Environment (ActionH)
+import Slack.Haskbot.SlashCommand (SlashCom (..))
+import Slack.Haskbot.Types
 import Web.Scotty.Trans (param)
-
-import Haskbot.Environment (ActionH)
-import Slack.Types
-
-data SlashCom = SlashCom { token       :: {-# UNPACK #-} !Token
-                         , teamID      :: {-# UNPACK #-} !TeamID
-                         , channelID   :: {-# UNPACK #-} !ChannelID
-                         , channelName :: {-# UNPACK #-} !ChannelName
-                         , userID      :: {-# UNPACK #-} !UserID
-                         , userName    :: {-# UNPACK #-} !UserName
-                         , command     :: {-# UNPACK #-} !Command
-                         , text        :: {-# UNPACK #-} !Text
-                         } deriving (Eq, Show)
 
 -- public functions
 
@@ -36,12 +23,6 @@ fromParams = newSlashCom <$> param "token"
                          <*> param "user_name"
                          <*> param "command"
                          <*> param "text"
-
-replySameChan :: SlashCom -> Channel
-replySameChan = Channel . channelName
-
-replyViaDM :: SlashCom -> Channel
-replyViaDM = DirectMsg . userName
 
 -- private functions
 

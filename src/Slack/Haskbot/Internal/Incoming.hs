@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Slack.Incoming
+module Slack.Haskbot.Internal.Incoming
 ( Incoming (..)
 , addToSendQueue
 , sendFromQueue
@@ -11,16 +11,14 @@ import Control.Concurrent.STM (atomically)
 import Control.Concurrent.STM.TVar (modifyTVar', readTVar)
 import Control.Monad (forever)
 import Control.Monad.Reader (ask, liftIO)
+import Data.Aeson (ToJSON, (.=), encode, object, toJSON)
 import qualified Data.ByteString.Char8 as BS
 import qualified Data.ByteString.Lazy as BL
 import Data.Text (Text)
-
-import Data.Aeson (ToJSON, (.=), encode, object, toJSON)
 import Network.HTTP.Conduit -- basically everything
 import Network.HTTP.Types (Header, methodPost, status200)
-
-import Haskbot.Environment (Haskbot, getSlackToken, incQueue, networkConn)
-import Slack.Types (Channel, getAddress)
+import Slack.Haskbot.Internal.Environment (Haskbot, getSlackToken, incQueue, networkConn)
+import Slack.Haskbot.Types (Channel, getAddress)
 
 data Incoming = Incoming { incChan ::                !Channel
                          , incText :: {-# UNPACK #-} !Text

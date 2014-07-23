@@ -1,18 +1,17 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Haskbot.Server (webServer) where
+module Slack.Haskbot.Internal.Server (webServer) where
 
 import Control.Concurrent (forkIO)
 import Control.Monad.Reader (lift, liftIO, runReaderT)
-import Data.Text.Lazy (fromStrict)
-
+import qualified Data.Text.Lazy as TL
+import Data.Time.Clock.POSIX (getPOSIXTime)
 import Network.HTTP.Types.Status (badRequest400, unauthorized401)
+import Slack.Haskbot.Internal.Environment (ActionH, ScottyH, getAppEnv)
+import Slack.Haskbot.Internal.Incoming (sendFromQueue)
+import Slack.Haskbot.Internal.Plugin (Plugin, isAuthorized, runPlugin, selectFrom)
+import Slack.Haskbot.Internal.SlashCommand (SlashCom, command, fromParams)
 import Web.Scotty.Trans (get, post, scottyT, status, text)
-
-import Haskbot.Environment (ActionH, ScottyH, getAppEnv, getAppTime)
-import Haskbot.Plugin (Plugin, isAuthorized, runPlugin, selectFrom)
-import Slack.Incoming (sendFromQueue)
-import Slack.SlashCom (SlashCom, command, fromParams)
 
 -- public functions
 
@@ -40,4 +39,7 @@ routes plugins = do
     get  "/ping"  $ timestamp
 
 timestamp :: ActionH ()
-timestamp = liftIO getAppTime >>= text . fromStrict
+timestamp = do
+    now <- liftIO getPOSIXTime
+    let stamp = show . truncate $ now * 1000000
+    text $ TL.pack stamp

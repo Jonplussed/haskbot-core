@@ -1,25 +1,21 @@
 {-# LANGUAGE RecordWildCards #-}
 
-module Haskbot.Environment
+module Slack.Haskbot.Internal.Environment
 ( Haskbot
 , ActionH
 , ScottyH
 , Environment (..)
 , getAppEnv
-, getAppTime
 , getSlackToken
 ) where
 
 import Control.Concurrent.STM.TVar (TVar, newTVarIO)
 import Control.Monad.Reader (ReaderT)
 import qualified Data.ByteString.Lazy as BL
-import qualified Data.Text as T
 import qualified Data.Text.Lazy as TL
-import Data.Time.Clock.POSIX (getPOSIXTime)
-import System.Environment (getEnv)
-
 import qualified Network.Connection as N
 import qualified Network.HTTP.Conduit as N
+import System.Environment (getEnv)
 import Web.Scotty.Trans (ActionT, ScottyT)
 
 type Haskbot = ReaderT Environment IO
@@ -36,9 +32,6 @@ tokenVar :: String
 tokenVar = "HASKBOT_TOKEN"
 
 -- public functions
-
-getAppTime :: IO T.Text
-getAppTime = getPOSIXTime >>= return . T.pack . show . truncate . (* 1000000)
 
 getSlackToken :: IO String
 getSlackToken = getEnv tokenVar

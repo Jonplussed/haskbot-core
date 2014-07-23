@@ -4,10 +4,10 @@ module Plugin.Help (register) where
 
 import Data.List (find)
 import qualified Data.Text as T
-
-import Haskbot.Plugin
-import Slack.SlashCom (replyViaDM, text)
-import Slack.Types (getCommand, setCommand)
+import Slack.Haskbot.Internal.Plugin (selectFrom)
+import Slack.Haskbot.Plugin
+import Slack.Haskbot.SlashCommand (text)
+import Slack.Haskbot.Types (getCommand, setCommand)
 
 -- constants
 
@@ -34,7 +34,7 @@ getHelp plugins (comName:_) =
     Nothing     -> listAllText plugins
 
 handler :: [Plugin] -> HandlerFn
-handler plugins slashCom = viaHaskbot (replyViaDM slashCom) reply
+handler plugins slashCom = return $ replyAsDM slashCom reply
   where reply = getHelp plugins . T.words $ text slashCom
 
 listAllText :: [Plugin] -> T.Text

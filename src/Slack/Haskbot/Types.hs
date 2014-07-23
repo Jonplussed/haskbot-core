@@ -1,4 +1,4 @@
-module Slack.Types
+module Slack.Haskbot.Types
 ( Token       (getToken)
 , TeamID      (getTeamID)
 , ChannelID   (getChanID)
