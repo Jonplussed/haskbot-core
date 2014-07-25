@@ -18,8 +18,30 @@ exporting the list of installed commands for "Slack.Haskbot". This enables you
 to recreate a registry of installed tokens and corresponding secret tokens
 in a separate file outside of version control.
 
-See "Slack.Haskbot.Plugin.HelloWorld" for an example of a very basic plugin, or
-"Slack.Haskbot.Plugin.Help" for one slightly more complex.
+A basic /Hello World/ plugin can created via:
+
+> module MyPlugins.HelloWorld (register) where
+>
+> import Slack.Haskbot.Plugin
+>
+> name :: NameStr
+> name = "hello_world"
+>
+> helpText :: HelpStr
+> helpText = "Say _Hello, World!_ in your current channel via `/hello_world`."
+>
+> handler :: HandlerFn
+> handler slashCom = return $ replySameChan slashCom "Hello, World!"
+>
+> register :: TokenStr -> Plugin
+> register = newPlugin name helpText handler
+
+To run the plugin, create a new Slack /slash command/ integration corresponding
+to the command @\/hello_world@ that points to your Haskbot server. Add the
+plugin's @register@ function to your Haskbot server's plugin registry like
+detailed in "Slack.Haskbot", giving it the Slack integration's secret token as
+the remaining argument. Rebuild and run the server. Typing @\/hello_word@
+into any Slack channel should return a Haskbot response of /Hellow, world!/
 -}
 
 module Slack.Haskbot.Plugin
