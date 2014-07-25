@@ -17,7 +17,8 @@ import qualified Data.ByteString.Lazy as BL
 import Data.Text (Text)
 import Network.HTTP.Conduit -- basically everything
 import Network.HTTP.Types (Header, methodPost, status200)
-import Slack.Haskbot.Internal.Environment (Haskbot, getSlackToken, incQueue, networkConn)
+import Slack.Haskbot.Internal.Environment (Haskbot, getSlackEndpoint, incQueue,
+                                           networkConn)
 import Slack.Haskbot.Types (Channel, getAddress)
 
 data Incoming = Incoming { incChan ::                !Channel
@@ -34,9 +35,6 @@ instance ToJSON Incoming where
 jsonContentType :: Header
 jsonContentType = ("Content-Type", "application/json")
 
-slackUrl :: String
-slackUrl = "https://bendyworks.slack.com/services/hooks/incoming-webhook"
-
 timeBetweenSends :: Int
 timeBetweenSends = 1000000 -- Slack rate limit
 
@@ -52,11 +50,10 @@ sendFromQueue = forever $ dequeueMsg >>= sendMsg >> wait
 
 incRequest :: Haskbot Request
 incRequest = do
-    token       <- liftIO getSlackToken
-    initRequest <- parseUrl slackUrl
+    endpoint    <- liftIO getSlackEndpoint
+    initRequest <- parseUrl endpoint
     return $ initRequest
-      { queryString       = BS.append "?token=" $ BS.pack token
-      , method            = methodPost
+      { method            = methodPost
       , rawBody           = True
       , requestHeaders    = [jsonContentType]
       }

@@ -6,7 +6,7 @@ module Slack.Haskbot.Internal.Environment
 , ScottyH
 , Environment (..)
 , getAppEnv
-, getSlackToken
+, getSlackEndpoint
 ) where
 
 import Control.Concurrent.STM.TVar (TVar, newTVarIO)
@@ -29,12 +29,12 @@ data Environment = Environment { networkConn :: N.Manager
 -- constants
 
 tokenVar :: String
-tokenVar = "HASKBOT_TOKEN"
+tokenVar = "HASKBOT_ENDPOINT"
 
 -- public functions
 
-getSlackToken :: IO String
-getSlackToken = getEnv tokenVar
+getSlackEndpoint :: IO String
+getSlackEndpoint = getEnv tokenVar
 
 getAppEnv :: IO Environment
 getAppEnv = do
