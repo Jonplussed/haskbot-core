@@ -1,16 +1,15 @@
-{-|
-Module      : Slack.Haskbot.Types
-Description : Wrappers for Slack API data types
-Copyright   : (c) Jonathan Childress 2014
-License     : MIT
-Maintainer  : jon@childr.es
-Stability   : experimental
-Portability : POSIX
-
-This provides wrappers for the various types of data supplied by the Slack API,
-so that any processing of the API data remains type-safe. No constructors are
-directly exported to allow for flexibility with the currently-beta Slack API.
--}
+-- | Module      : Slack.Haskbot.Types
+--   Description : Wrappers for Slack API data types
+--   Copyright   : (c) Jonathan Childress 2014
+--   License     : MIT
+--   Maintainer  : jon@childr.es
+--   Stability   : experimental
+--   Portability : POSIX
+--
+--   This provides wrappers for the various types of data supplied by the Slack
+--   API, so that any processing of the API data remains type-safe. No
+--   constructors are directly exported to allow for flexibility with the
+--   currently-beta Slack API.
 
 module Slack.Haskbot.Types
 (

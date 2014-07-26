@@ -1,16 +1,15 @@
-{-|
-Module      : Slack.Haskbot.SlashCommand
-Description : Wrapper for the Slack API /slash command/ integration
-Copyright   : (c) Jonathan Childress 2014
-License     : MIT
-Maintainer  : jon@childr.es
-Stability   : experimental
-Portability : POSIX
-
-This provides a representation of the request data from a Slack /slash command/
-integration. A "Slack.Haskbot.Plugin" handler function is given direct access
-to this data type when a /slash command/ is invoked via Slack.
--}
+-- | Module      : Slack.Haskbot.SlashCommand
+--   Description : Wrapper for the Slack API /slash command/ integration
+--   Copyright   : (c) Jonathan Childress 2014
+--   License     : MIT
+--   Maintainer  : jon@childr.es
+--   Stability   : experimental
+--   Portability : POSIX
+--
+--   This provides a representation of the request data from a Slack /slash
+--   command/ integration. A "Slack.Haskbot.Plugin" handler function is given
+--   direct access to this data type when a /slash command/ is invoked via
+--   Slack.
 
 module Slack.Haskbot.SlashCommand
 (

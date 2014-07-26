@@ -1,48 +1,51 @@
-{-|
-Module      : Slack.Haskbot.Plugin
-Description : Everything needed to create a Haskbot plugin
-Copyright   : (c) Jonathan Childress 2014
-License     : MIT
-Maintainer  : jon@childr.es
-Stability   : experimental
-Portability : POSIX
-
-Haskbot plugins are functions returning a 'Plugin' data type. The 'Plugin' type
-is not exported directly; you should create new plugins via 'newPlugin'.
-
-The recommended process for exporting plugins is to create a new module that
-exports a single function currying the first three arguments to 'newPlugin'.
-The remaining argument, the Slack secret token of the corresponding Slack
-/slash command/ service integration, can be supplied in a separate file
-exporting the list of installed commands for "Slack.Haskbot". This enables you
-to recreate a registry of installed tokens and corresponding secret tokens
-in a separate file outside of version control.
-
-A basic /Hello World/ plugin can created via:
-
-> module MyPlugins.HelloWorld (register) where
->
-> import Slack.Haskbot.Plugin
->
-> name :: NameStr
-> name = "hello_world"
->
-> helpText :: HelpStr
-> helpText = "Say _Hello, World!_ in your current channel via `/hello_world`."
->
-> handler :: HandlerFn
-> handler slashCom = return $ replySameChan slashCom "Hello, World!"
->
-> register :: TokenStr -> Plugin
-> register = newPlugin name helpText handler
-
-To run the plugin, create a new Slack /slash command/ integration corresponding
-to the command @\/hello_world@ that points to your Haskbot server. Add the
-plugin's @register@ function to your Haskbot server's plugin registry like
-detailed in "Slack.Haskbot", giving it the Slack integration's secret token as
-the remaining argument. Rebuild and run the server. Typing @\/hello_word@
-into any Slack channel should return a Haskbot response of /Hellow, world!/
--}
+-- | Module      : Slack.Haskbot.Plugin
+--   Description : Everything needed to create a Haskbot plugin
+--   Copyright   : (c) Jonathan Childress 2014
+--   License     : MIT
+--   Maintainer  : jon@childr.es
+--   Stability   : experimental
+--   Portability : POSIX
+--
+--   Haskbot plugins are functions returning a 'Plugin' data type. The 'Plugin'
+--   type is not exported directly; you should create new plugins via
+--   'newPlugin'.
+--
+--   The recommended process for exporting plugins is to create a new module
+--   that exports a single function currying the first three arguments to
+--   'newPlugin'. The remaining argument, the Slack secret token of the
+--   corresponding Slack /slash command/ service integration, can be supplied
+--   in a separate file exporting the list of installed commands for
+--   "Slack.Haskbot". This enables you to recreate a registry of installed
+--   tokens and corresponding secret tokens in a separate file outside of
+--   version control.
+--
+--   A basic /Hello World/ plugin can created via:
+--
+-- > {-# LANGUAGE OverloadedStrings #-}
+-- >
+-- > module MyPlugins.HelloWorld (register) where
+-- >
+-- > import Slack.Haskbot.Plugin
+-- >
+-- > name :: NameStr
+-- > name = "hello_world"
+-- >
+-- > helpText :: HelpStr
+-- > helpText = "Have Haskbot say _Hello, World!_ in your current channel."
+-- >
+-- > handler :: HandlerFn
+-- > handler slashCom = return $ replySameChan slashCom "Hello, World!"
+-- >
+-- > register :: TokenStr -> Plugin
+-- > register = newPlugin name helpText handler
+--
+--   To run the plugin, create a new Slack /slash command/ integration
+--   corresponding to the command @\/hello_world@ that points to your Haskbot
+--   server. Add the plugin's @register@ function to your Haskbot server's
+--   plugin registry like detailed in "Slack.Haskbot", giving it the Slack
+--   integration's secret token as the remaining argument. Rebuild and run the
+--   server. Typing @\/hello_word@ into any Slack channel should return a
+--   Haskbot response of /Hellow, world!/
 
 module Slack.Haskbot.Plugin
 (
@@ -53,7 +56,7 @@ module Slack.Haskbot.Plugin
 , plHelpText
 , plHandler
 , plToken
--- ** Helper types
+-- ** Type aliases
 , NameStr
 , HelpStr
 , HandlerFn
