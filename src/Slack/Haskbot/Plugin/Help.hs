@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Plugin.Help (register) where
+module Slack.Haskbot.Plugin.Help (register) where
 
 import Data.List (find)
 import qualified Data.Text as T
