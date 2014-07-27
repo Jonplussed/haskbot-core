@@ -39,33 +39,33 @@ library
                       Slack.Haskbot.Internal.SlashCommand
                       Slack.Haskbot.Internal.Types
                       Slack.Haskbot.Plugin.Help
-  build-depends:      aeson        == 0.6.*
-                      base         == 4.6.*
-                      bytestring   == 0.10.*
-                      connection   == 0.2.*
-                      http-conduit == 2.1.*
-                      http-types   == 0.8.*
-                      monads-tf    == 0.1.*
-                      scotty       == 0.8.*
-                      stm          == 2.4.*
-                      text         == 0.11.*
-                      time         == 1.4.*
   default-language:   Haskell2010
+  build-depends:      aeson        == 0.6.*,
+                      base         == 4.6.*,
+                      bytestring   == 0.10.*,
+                      connection   == 0.2.*,
+                      http-conduit == 2.1.*,
+                      http-types   == 0.8.*,
+                      monads-tf    == 0.1.*,
+                      scotty       == 0.8.*,
+                      stm          == 2.4.*,
+                      text         == 0.11.*,
+                      time         == 1.4.*
 
 test-suite            spec
   hs-source-dirs:     src, test
   main-is:            Spec.hs
-  build-depends:      aeson        >= 0.6 && < 2.0,
-                      base         >= 4.6 && < 4.7,
-                      bytestring   >= 0.10 && < 2.0,
-                      connection   >= 0.2 && < 2.0,
-                      hspec        >= 1.8 && < 2.0,
-                      http-conduit >= 2.1 && < 3.0,
-                      http-types   >= 0.8.5 && < 2.0,
-                      monads-tf    >= 0.1 && < 2.0,
-                      scotty       >= 0.8 && < 2.0,
-                      stm          >= 2.4 && < 3.0,
-                      text         >= 0.11 && < 2.0,
-                      time         >= 1.4 && < 2.0
-  type:               exitcode-stdio-1.0
   default-language:   Haskell2010
+  type:               exitcode-stdio-1.0
+  build-depends:      aeson        == 0.6.*,
+                      base         == 4.6.*,
+                      bytestring   == 0.10.*,
+                      connection   == 0.2.*,
+                      hspec        == 1.8.*,
+                      http-conduit == 2.1.*,
+                      http-types   == 0.8.*,
+                      monads-tf    == 0.1.*,
+                      scotty       == 0.8.*,
+                      stm          == 2.4.*,
+                      text         == 0.11.*,
+                      time         == 1.4.*
