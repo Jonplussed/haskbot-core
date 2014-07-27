@@ -1,4 +1,4 @@
-name:                 haskbot
+name:                 haskbot-core
 version:              0.0.1.0
 maintainer:           Jonathan Childress <jon@childr.es>
 homepage:             https://github.com/jonplussed/haskbot-core
