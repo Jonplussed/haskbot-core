@@ -9,7 +9,8 @@ The purpose of this little bot is to provide:
 - a playground for exciting Haskell web modules, such as WAI, Warp, and Aeson
 
 This `README` only demonstrates how to setup a Haskell dev environment for
-creating Haskbot plugins. Further documentation can be found on Hackage.
+creating Haskbot plugins. Further documentation can be found on
+[Hackage](http://hackage.haskell.org/package/haskbot-core).
 
 ### New to Haskell?
 
@@ -63,7 +64,8 @@ this means your package manager probably provides it for you.
 ### Create Plugins
 
 You're now ready to begin creating plugins for your very own Haskbot! Continue
-on to Hackage for a full Haskbot API description and examples.
+on to [Hackage](http://hackage.haskell.org/package/haskbot-core) for a full
+Haskbot API description and examples.
 
 ### Thanks
 

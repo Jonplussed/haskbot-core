@@ -17,7 +17,7 @@ description:          Haskbot melds together the Slack /slash command/ and /inco
                       write nice, clean Haskell than clunky Javascript any day of the week.
 
 stability:            volatile
-category:             web
+category:             Network
 build-type:           Simple
 extra-source-files:   README.md
 cabal-version:        >= 1.10
