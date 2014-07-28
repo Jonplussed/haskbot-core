@@ -1,6 +1,6 @@
 # Haskbot
 
-### A easily-extensible, Haskell-based Slack chatbot
+### An easily-extensible, Haskell-based Slack chatbot
 
 The purpose of this little bot is to provide:
 
@@ -61,7 +61,7 @@ this means your package manager probably provides it for you.
    cabal install haskbot-core
    ```
 
-### Create Plugins
+### Creating Plugins
 
 You're now ready to begin creating plugins for your very own Haskbot! Continue
 on to [Hackage](http://hackage.haskell.org/package/haskbot-core) for a full
