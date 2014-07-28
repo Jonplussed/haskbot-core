@@ -1,6 +1,6 @@
 # Haskbot
 
-### A Haskell-based chatbot using the Scotty web framework.
+### A easily-extensible, Haskell-based Slack chatbot
 
 The purpose of this little bot is to provide:
 
@@ -8,10 +8,8 @@ The purpose of this little bot is to provide:
 - a simple platform for Bendyworkers to learn Haskell
 - a playground for exciting Haskell web modules, such as WAI, Warp, and Aeson
 
-Because this application is designed for beginners, setup will begin with
-bootstrapping a Haskell development environment. If you already know the
-basics, feel free to skip to [bootstrapping](#bootstrapping) or
-[creating plugins](#creating-plugins).
+This `README` only demonstrates how to setup a Haskell dev environment for
+creating Haskbot plugins. Further documentation can be found on Hackage.
 
 ### New to Haskell?
 
@@ -22,9 +20,7 @@ course, I highly recommend the entire book when you've time.
 If you're an in-house Bendyworker, I'm also available before/after hours or
 during growth time to help or answer any questions.
 
-## Bootstrapping
-
-### Installing the Haskell Platform
+### Installing the Haskell Platform and Haskbot
 
 To run Haskbot locally, all you require is the latest Haskell platform. If your
 distro of choice isn't
@@ -49,7 +45,7 @@ this means your package manager probably provides it for you.
    `$PATH`. This is usually done by adding the following lines to
    `~/.profile` or `~/.bash_profile` (whichever you have/prefer).
    ```sh
-   PATH="/home/[your_username]/.cabal/bin:$PATH"
+   PATH="$HOME/.cabal/bin:$PATH"
    export PATH
    ```
    Make sure to re-source whatever file contains the new `$PATH`, like so:
@@ -61,148 +57,19 @@ this means your package manager probably provides it for you.
    ```sh
    cabal update
    cabal install cabal-install
+   cabal install haskbot-core
    ```
 
-### Bootstrapping a Haskbot Development Environment
+### Create Plugins
 
-Once you have the platform, setting up a development environment is a breeze
-(but it does take a few minutes while everything compiles).
-
-1. Clone this repository into the directory of your choice via:
-
-   ```sh
-   git clone https://github.com/Jonplussed/Haskbot.git
-   ```
-
-2. Install any required dependencies via:
-
-   ```sh
-   cd [your Haskbot directory]
-   cabal sandbox init
-   cabal install --only-dependencies
-   ```
-
-3. Build, baby, build!
-
-   ```sh
-   cabal build
-   ```
-
-4. Run the server with the required environmental variables:
-
-   ```sh
-   SLACK_TOKEN=[you'll need to get this] \
-   PORT=[your port of choice] \
-   ./dist/build/Haskbot/Haskbot
-   ```
-
-8. Test that the Haskbot server is running by pinging
-   `http://localhost:[your port from above]`.
-
-## Creating Plugins
-
-Plugins for Haskbot are at heart functions that parse an input string and
-return an output string (and perhaps do something side-effecty on the server).
-Adding a plugin for Haskbot is simple process:
-
-1. **Add the requisite files**
-
-   You only need to create two files to construct a complete plugin:
-   - `src/Plugins/[YourPluginName].hs` holds your plugin code
-   - `test/Plugins/[YourPluginName]Spec.hs` holds your plugin's tests
-
-2. **Write tests for your plugin**
-
-   Plugins tests are written in the fantastic [HSpec](http://hspec.github.io/)
-   testing DSL. Because most plugins are a simple input string to output
-   string transformation, the most common test case has been simplified
-   with the `responsesFor` spec helper.
-   ```haskell
-   spec :: Spec
-   spec = do
-     describe "myPluginName" $ do
-       responsesFor myPlugin
-         [ ("first input string",   "first expected output string")
-         , ("second input string",  "second expected output string")
-         ]
-   ```
-   Of course, any plugins with side effects (such as setting a Redis key/value)
-   will require additional, more complicated specs.
-
-   To run specs, from your project root, run:
-   ```sh
-   cabal build spec && ./dist/build/spec/spec
-   ```
-   to rebuild the project and see the HSpec output.
-
-3. **Write your plugin**
-
-   Plugins require three things: a name, some help text describing how to use
-   the plugin, and the plugin function that parses an input string, maybe does
-   something side-effecty, and returns an output string.
-
-   To write the function, the `Parser.Commons` module contains prefabricated
-   parsers for the most common chatbot uses. For more advanced functionality,
-   the famous `Text.Parsec` parser modules are available.
-
-   **Example:** a plugin called _foobar_ which is invoked via `haskbot foobar
-   [any text after]` can be written in entirety as:
-
-   ```haskell
-   {-# LANGUAGE OverloadedStrings #-}
-
-   module Plugins.Foobar (plugin) where
-
-   import Parser.Common
-   import Type.Plugin
-
-   plugin :: Plugin
-   plugin = newPlugin name helpText parser
-
-   name :: Name
-   name = "foobar"
-
-   helpText :: HelpText
-   helpText = "this is how to use `haskbot foobar`"
-
-   parser :: InputParser
-   parser = withText doSomething
-
-   doSomething :: String -> String
-   doSomething = ... -- function body goes here
-   ```
-
-4. **Register your plugin**
-
-   To include your plugin in those run by Haskbot, import your plugin module in
-   the `Registry` module and add your plugin to the list in the `registry`
-   function.
-
-5. **Send a pull request**
-
-   I'll take care of compiling and deploying the updated Haskbot. Send me a
-   me a pull request, I'll ensure your plugin is tested, and I'll redeploy
-   Haskbot with new functionality included!
-
-## More
-
-### Supporting Additional Chat Protocols
-
-Haskbot currently supports only [Slack](https://api.slack.com/), but
-additional protocols can be added in the `src/Protocols/` directory. Each
-protocol handles the request/response cycle differently, so nothing is
-currently abstracted. See the `Protocols.Slack...` modules for one example of
-a simple request/response handler.
+You're now ready to begin creating plugins for your very own Haskbot! Continue
+on to Hackage for a full Haskbot API description and examples.
 
 ### Thanks
 
 I wouldn't have had time to write this without the growth time supplied by
 [Bendyworks](http://bendyworks.com/). Hey, employers! This is what developers
 need to survive.
-
-This project couldn't be hosted on Heroku without Joe Nelson's amazing
-[Heroku buildpack](https://github.com/begriffs/heroku-buildpack-ghc). Holy
-crap, what a script.
 
 ### License
 
