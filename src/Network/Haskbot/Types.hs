@@ -1,4 +1,4 @@
--- | Module      : Slack.Haskbot.Types
+-- | Module      : Network.Haskbot.Types
 --   Description : Wrappers for Slack API data types
 --   Copyright   : (c) Jonathan Childress 2014
 --   License     : MIT
@@ -10,7 +10,7 @@
 --   API, so that any processing of the API data remains type-safe. No
 --   constructors are directly exported to allow for flexibility with the
 --   currently-beta Slack API.
-module Slack.Haskbot.Types
+module Network.Haskbot.Types
 (
 -- * Slack types
 -- ** Token

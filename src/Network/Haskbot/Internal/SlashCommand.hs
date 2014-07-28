@@ -1,15 +1,15 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Slack.Haskbot.Internal.SlashCommand
+module Network.Haskbot.Internal.SlashCommand
 ( SlashCom (..)
 , fromParams
 ) where
 
 import Control.Applicative ((<$>), (<*>))
 import Data.Text (Text)
-import Slack.Haskbot.Internal.Environment (ActionH)
-import Slack.Haskbot.SlashCommand (SlashCom (..))
-import Slack.Haskbot.Types
+import Network.Haskbot.Internal.Environment (ActionH)
+import Network.Haskbot.SlashCommand (SlashCom (..))
+import Network.Haskbot.Types
 import Web.Scotty.Trans (param)
 
 -- public functions

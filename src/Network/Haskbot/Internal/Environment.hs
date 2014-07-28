@@ -1,6 +1,6 @@
 {-# LANGUAGE RecordWildCards #-}
 
-module Slack.Haskbot.Internal.Environment
+module Network.Haskbot.Internal.Environment
 ( Haskbot
 , ActionH
 , ScottyH

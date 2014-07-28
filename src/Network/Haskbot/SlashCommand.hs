@@ -1,4 +1,4 @@
--- | Module      : Slack.Haskbot.SlashCommand
+-- | Module      : Network.Haskbot.SlashCommand
 --   Description : Wrapper for the Slack API /slash command/ integration
 --   Copyright   : (c) Jonathan Childress 2014
 --   License     : MIT
@@ -10,14 +10,14 @@
 --   command/ integration. A "Plugin" handler function is given
 --   direct access to this data type when a /slash command/ is invoked via
 --   Slack.
-module Slack.Haskbot.SlashCommand
+module Network.Haskbot.SlashCommand
 (
   -- * The SlashCom type
   SlashCom (..)
 ) where
 
 import Data.Text
-import Slack.Haskbot.Types
+import Network.Haskbot.Types
 
 -- | Encapsulates all data provided by a request from a Slack /slash command/
 -- integration

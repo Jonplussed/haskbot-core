@@ -1,4 +1,4 @@
--- | Module      : Slack.Haskbot.Plugin
+-- | Module      : Network.Haskbot.Plugin
 --   Description : Everything needed to create a Haskbot plugin
 --   Copyright   : (c) Jonathan Childress 2014
 --   License     : MIT
@@ -24,7 +24,7 @@
 -- >
 -- > module MyPlugins.HelloWorld (register) where
 -- >
--- > import Slack.Haskbot.Plugin
+-- > import Network.Haskbot.Plugin
 -- >
 -- > name :: NameStr
 -- > name = "hello_world"
@@ -45,7 +45,7 @@
 --   integration's secret token as the remaining argument. Rebuild and run the
 --   server. Typing @\/hello_word@ into any Slack channel should return a
 --   Haskbot response of /Hellow, world!/
-module Slack.Haskbot.Plugin
+module Network.Haskbot.Plugin
 (
 -- * Plugins
   Plugin
@@ -60,10 +60,10 @@ module Slack.Haskbot.Plugin
 ) where
 
 import Data.Text (Text)
-import Slack.Haskbot.Internal.Environment (Haskbot)
-import Slack.Haskbot.Internal.Incoming (Incoming (Incoming), addToSendQueue)
-import Slack.Haskbot.Internal.SlashCommand (SlashCom (..))
-import Slack.Haskbot.Types
+import Network.Haskbot.Internal.Environment (Haskbot)
+import Network.Haskbot.Internal.Incoming (Incoming (Incoming), addToSendQueue)
+import Network.Haskbot.Internal.SlashCommand (SlashCom (..))
+import Network.Haskbot.Types
 
 data Plugin = Plugin { plCommand  :: {-# UNPACK #-} !Command
                      , plHelpText :: {-# UNPACK #-} !Text

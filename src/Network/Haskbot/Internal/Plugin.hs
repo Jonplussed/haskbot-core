@@ -1,4 +1,4 @@
-module Slack.Haskbot.Internal.Plugin
+module Network.Haskbot.Internal.Plugin
 ( Plugin (..)
 , isAuthorized
 , runPlugin
@@ -7,11 +7,11 @@ module Slack.Haskbot.Internal.Plugin
 
 import Data.List (find)
 import Data.Text (Text)
-import Slack.Haskbot.Internal.Environment (Haskbot)
-import Slack.Haskbot.Internal.Incoming (Incoming (Incoming), addToSendQueue)
-import Slack.Haskbot.Plugin (Plugin (..))
-import Slack.Haskbot.SlashCommand (SlashCom, token)
-import Slack.Haskbot.Types
+import Network.Haskbot.Internal.Environment (Haskbot)
+import Network.Haskbot.Internal.Incoming (Incoming (Incoming), addToSendQueue)
+import Network.Haskbot.Plugin (Plugin (..))
+import Network.Haskbot.SlashCommand (SlashCom, token)
+import Network.Haskbot.Types
 
 runPlugin :: Plugin -> SlashCom -> Haskbot ()
 runPlugin p slashCom = plHandler p slashCom >>= maybe (return ()) addToSendQueue

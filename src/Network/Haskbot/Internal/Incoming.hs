@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Slack.Haskbot.Internal.Incoming
+module Network.Haskbot.Internal.Incoming
 ( Incoming (..)
 , addToSendQueue
 , sendFromQueue
@@ -17,10 +17,10 @@ import qualified Data.ByteString.Lazy as BL
 import Data.Text (Text)
 import Network.HTTP.Conduit -- basically everything
 import Network.HTTP.Types (Header, methodPost, status200)
-import Slack.Haskbot.Incoming
-import Slack.Haskbot.Internal.Environment (Haskbot, getSlackEndpoint, incQueue,
+import Network.Haskbot.Incoming
+import Network.Haskbot.Internal.Environment (Haskbot, getSlackEndpoint, incQueue,
                                            networkConn)
-import Slack.Haskbot.Types (getAddress)
+import Network.Haskbot.Types (getAddress)
 
 instance ToJSON Incoming where
   toJSON inc = object [ "channel" .= getAddress (incChan inc)

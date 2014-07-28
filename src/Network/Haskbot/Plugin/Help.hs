@@ -1,13 +1,13 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Slack.Haskbot.Plugin.Help (register) where
+module Network.Haskbot.Plugin.Help (register) where
 
 import Data.List (find)
 import qualified Data.Text as T
-import Slack.Haskbot.Internal.Plugin (selectFrom)
-import Slack.Haskbot.Plugin
-import Slack.Haskbot.SlashCommand (text)
-import Slack.Haskbot.Types (getCommand, setCommand)
+import Network.Haskbot.Internal.Plugin (selectFrom)
+import Network.Haskbot.Plugin
+import Network.Haskbot.SlashCommand (text)
+import Network.Haskbot.Types (getCommand, setCommand)
 
 -- constants
 

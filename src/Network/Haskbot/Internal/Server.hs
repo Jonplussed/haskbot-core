@@ -1,16 +1,16 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Slack.Haskbot.Internal.Server (webServer) where
+module Network.Haskbot.Internal.Server (webServer) where
 
 import Control.Concurrent (forkIO)
 import Control.Monad.Reader (lift, liftIO, runReaderT)
 import qualified Data.Text.Lazy as TL
 import Data.Time.Clock.POSIX (getPOSIXTime)
+import Network.Haskbot.Internal.Environment (ActionH, ScottyH, getAppEnv)
+import Network.Haskbot.Internal.Incoming (sendFromQueue)
+import Network.Haskbot.Internal.Plugin (Plugin, isAuthorized, runPlugin, selectFrom)
+import Network.Haskbot.Internal.SlashCommand (SlashCom, command, fromParams)
 import Network.HTTP.Types.Status (badRequest400, unauthorized401)
-import Slack.Haskbot.Internal.Environment (ActionH, ScottyH, getAppEnv)
-import Slack.Haskbot.Internal.Incoming (sendFromQueue)
-import Slack.Haskbot.Internal.Plugin (Plugin, isAuthorized, runPlugin, selectFrom)
-import Slack.Haskbot.Internal.SlashCommand (SlashCom, command, fromParams)
 import Web.Scotty.Trans (get, post, scottyT, status, text)
 
 -- public functions

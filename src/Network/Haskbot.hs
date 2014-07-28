@@ -1,4 +1,4 @@
--- | Module      : Slack.Haskbot
+-- | Module      : Network.Haskbot
 --   Description : An easily-extensible Slack chatbot server
 --   Copyright   : (c) Jonathan Childress 2014
 --   License     : MIT
@@ -10,8 +10,8 @@
 --
 -- > {-# LANGUAGE OverloadedStrings #-}
 -- >
--- > import Slack.Haskbot
--- > import Slack.Haskbot.Plugin
+-- > import Network.Haskbot
+-- > import Network.Haskbot.Plugin
 -- > import qualified Slack.Haskbot.Plugin.Help as Help
 -- >
 -- > main :: IO ()
@@ -29,17 +29,15 @@
 --   with the local @HASKBOT_ENDPOINT@ environment variable set to the
 --   integration's endpoint URL (including the secret key query string), so that
 --   Slack can process replies from Haskbot.
-module Slack.Haskbot
+module Network.Haskbot
 (
--- * The Haskbot monad
-  Haskbot
 -- * Run a Haskbot server
-, haskbot
+  Haskbot, haskbot
 ) where
 
-import Slack.Haskbot.Internal.Environment (Haskbot)
-import Slack.Haskbot.Internal.Server (webServer)
-import Slack.Haskbot.Internal.Plugin (Plugin)
+import Network.Haskbot.Internal.Environment (Haskbot)
+import Network.Haskbot.Internal.Server (webServer)
+import Network.Haskbot.Internal.Plugin (Plugin)
 
 -- | Run a Haskbot server with the listed plugins on the specified port.
 haskbot :: [Plugin] -- ^ List of all Haskbot plugins to include
