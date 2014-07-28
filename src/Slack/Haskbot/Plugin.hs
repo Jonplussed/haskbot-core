@@ -46,28 +46,18 @@
 --   integration's secret token as the remaining argument. Rebuild and run the
 --   server. Typing @\/hello_word@ into any Slack channel should return a
 --   Haskbot response of /Hellow, world!/
-
 module Slack.Haskbot.Plugin
 (
 -- * Plugins
   Plugin
 -- ** PLugin components
-, plCommand
-, plHelpText
-, plHandler
-, plToken
+, plCommand, plHelpText, plHandler, plToken
 -- ** Type aliases
-, NameStr
-, HelpStr
-, HandlerFn
-, TokenStr
+, NameStr, HelpStr, HandlerFn, TokenStr
 -- ** Creating a new Plugin
 , newPlugin
 -- * Slack replies
-, Reply (..)
--- ** Common reply types
-, replySameChan
-, replyAsDM
+, replySameChan, replyAsDM
 ) where
 
 import Data.Text (Text)
@@ -84,7 +74,7 @@ data Plugin = Plugin { plCommand  :: {-# UNPACK #-} !Command
 
 type NameStr   = Text
 type HelpStr   = Text
-type HandlerFn = SlashCom -> Haskbot Reply
+type HandlerFn = SlashCom -> Haskbot (Maybe Incoming)
 type TokenStr  = Text
 
 -- | Create a new 'Plugin' from the components
@@ -92,25 +82,20 @@ newPlugin :: NameStr   -- ^ The text name of the plugin command
           -> HelpStr   -- ^ Help text displayed in conjunction with the
                        -- "Slack.Haskbot.Plugin.Help" plugin
           -> HandlerFn -- ^ A function that takes a "Slack.Haskbot.SlashCommand"
-                       -- and returns a 'Haskbot' 'Reply'
+                       -- and potentially returns a 'Incoming'
           -> TokenStr  -- ^ The secret token of the Slack /slash command/
                        -- integration associated with this plugin
           -> Plugin
 newPlugin com help handler token =
   Plugin (setCommand com) help handler (setToken token)
 
--- | An optional reply to Slack from the plugin
-data Reply
-  = ViaHaskbot Incoming -- ^ Reply with a Slack /incoming/ integration message
-  | NoReply             -- ^ Don't send any reply
-
 -- | Send a Slack reply to the same channel as where the corresponding /slash
 -- command/ was invoked, formatted according to
 -- <https://api.slack.com/docs/formatting Slack>
-replySameChan :: SlashCom -> Text -> Reply
-replySameChan sc = ViaHaskbot . Incoming (Channel $ channelName sc)
+replySameChan :: SlashCom -> Text -> Maybe Incoming
+replySameChan sc = Just . Incoming (Channel $ channelName sc)
 
 -- | Send a Slack reply as a DM to the user who invoked the /slash command/,
 -- formatted according to <https://api.slack.com/docs/formatting Slack>
-replyAsDM :: SlashCom -> Text -> Reply
-replyAsDM sc = ViaHaskbot . Incoming (DirectMsg $ userName sc)
+replyAsDM :: SlashCom -> Text -> Maybe Incoming
+replyAsDM sc = Just . Incoming (DirectMsg $ userName sc)

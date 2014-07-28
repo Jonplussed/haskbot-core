@@ -29,9 +29,8 @@ register = newPlugin name helpText . handler
 getHelp :: [Plugin] -> [T.Text] -> T.Text
 getHelp plugins []          = listAllText plugins
 getHelp plugins (comName:_) =
-  case selectFrom plugins (setCommand comName) of
-    Just plugin -> plHelpText plugin
-    Nothing     -> listAllText plugins
+  maybe (listAllText plugins) plHelpText
+    (selectFrom plugins $ setCommand comName)
 
 handler :: [Plugin] -> HandlerFn
 handler plugins slashCom = return $ replyAsDM slashCom reply
