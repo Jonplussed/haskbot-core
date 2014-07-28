@@ -7,13 +7,12 @@
 --   Portability : POSIX
 --
 --   This provides a representation of the request data from a Slack /slash
---   command/ integration. A "Slack.Haskbot.Plugin" handler function is given
+--   command/ integration. A "Plugin" handler function is given
 --   direct access to this data type when a /slash command/ is invoked via
 --   Slack.
-
 module Slack.Haskbot.SlashCommand
 (
-  -- * Types
+  -- * The SlashCom type
   SlashCom (..)
 ) where
 

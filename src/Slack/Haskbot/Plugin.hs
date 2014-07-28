@@ -6,7 +6,7 @@
 --   Stability   : experimental
 --   Portability : POSIX
 --
---   Haskbot plugins are functions returning a 'Plugin' data type. The 'Plugin'
+--   Haskbot plugins are functions returning a "Plugin" data type. The "Plugin"
 --   type is not exported directly; you should create new plugins via
 --   'newPlugin'.
 --
@@ -14,10 +14,9 @@
 --   that exports a single function currying the first three arguments to
 --   'newPlugin'. The remaining argument, the Slack secret token of the
 --   corresponding Slack /slash command/ service integration, can be supplied
---   in a separate file exporting the list of installed commands for
---   "Slack.Haskbot". This enables you to recreate a registry of installed
---   tokens and corresponding secret tokens in a separate file outside of
---   version control.
+--   in a separate file exporting the list of installed commands for "Haskbot".
+--   This enables you to recreate a registry of installed tokens and
+--   corresponding secret tokens in a separate file outside of version control.
 --
 --   A basic /Hello World/ plugin can created via:
 --

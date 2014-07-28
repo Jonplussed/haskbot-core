@@ -21,15 +21,14 @@
 -- > registry = [ Help.register registry "my_secret_token" ]
 --
 --   This will run Haskbot on port 3000 with the included
---   "Slack.Haskbot.Plugins.Help" plugin installed, where @\"my_secret_token\"@
---   is the secret token of a Slack slash command integration corresponding to
---   the @/haskbot@ command and pointing to the Haskbot server.
+--   "Help" plugin installed, where @\"my_secret_token\"@ is the secret token
+--   of a Slack slash command integration corresponding to the @/haskbot@
+--   command and pointing to the Haskbot server.
 --
 --   Be sure to create a Slack incoming integration (usually named /Haskbot/)
 --   with the local @HASKBOT_ENDPOINT@ environment variable set to the
 --   integration's endpoint URL (including the secret key query string), so that
 --   Slack can process replies from Haskbot.
-
 module Slack.Haskbot
 (
 -- * The Haskbot monad
