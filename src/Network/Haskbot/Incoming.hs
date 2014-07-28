@@ -1,12 +1,4 @@
--- | Module      : Network.Haskbot.Incoming
---   Description : Wrapper for the Slack API /incoming/ integration
---   Copyright   : (c) Jonathan Childress 2014
---   License     : MIT
---   Maintainer  : jon@childr.es
---   Stability   : experimental
---   Portability : POSIX
---
---   This provides a simple representation of the request data for a Slack
+-- | This provides a simple representation of the request data for a Slack
 --   /incoming/ integration- the means via which Haskbot replies to Slack.
 --   Currently only simple text replies are supported, but this will be expanded
 --   to support fully-slack-formatted messages in the future.

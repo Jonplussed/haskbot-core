@@ -1,24 +1,15 @@
--- | Module      : Network.Haskbot.Plugin
---   Description : Everything needed to create a Haskbot plugin
---   Copyright   : (c) Jonathan Childress 2014
---   License     : MIT
---   Maintainer  : jon@childr.es
---   Stability   : experimental
---   Portability : POSIX
---
---   Haskbot plugins are functions returning a "Plugin" data type. The "Plugin"
+-- | Haskbot plugins are functions returning a 'Plugin' data type. The 'Plugin'
 --   type is not exported directly; you should create new plugins via
 --   'newPlugin'.
 --
 --   The recommended process for exporting plugins is to create a new module
 --   that exports a single function currying the first three arguments to
---   'newPlugin'. The remaining argument, the Slack secret token of the
---   corresponding Slack /slash command/ service integration, can be supplied
---   in a separate file exporting the list of installed commands for "Haskbot".
---   This enables you to recreate a registry of installed tokens and
+--   'newPlugin'. The remaining argument, the Slack secret token, can be
+--   supplied in a separate file exporting the list of installed commands for
+--   Haskbot. This enables you to recreate a registry of installed tokens and
 --   corresponding secret tokens in a separate file outside of version control.
 --
---   A basic /Hello World/ plugin can created via:
+--   A basic /Hello World/ plugin can be created via:
 --
 -- > {-# LANGUAGE OverloadedStrings #-}
 -- >
@@ -41,21 +32,20 @@
 --   To run the plugin, create a new Slack /slash command/ integration
 --   corresponding to the command @\/hello_world@ that points to your Haskbot
 --   server. Add the plugin's @register@ function to your Haskbot server's
---   plugin registry like detailed in "Slack.Haskbot", giving it the Slack
+--   plugin registry like detailed in "Network.Haskbot", giving it the Slack
 --   integration's secret token as the remaining argument. Rebuild and run the
 --   server. Typing @\/hello_word@ into any Slack channel should return a
---   Haskbot response of /Hellow, world!/
+--   Haskbot response of /Hello, world!/
 module Network.Haskbot.Plugin
 (
--- * Plugins
-  Plugin
--- ** PLugin components
-, plCommand, plHelpText, plHandler, plToken
--- ** Type aliases
+-- * The Plugin type
+  Plugin (..)
+-- * Creating Plugins
+-- ** Helpful Type aliases
 , NameStr, HelpStr, HandlerFn, TokenStr
 -- ** Creating a new Plugin
 , newPlugin
--- * Slack replies
+-- * Common Slack replies
 , replySameChan, replyAsDM
 ) where
 
@@ -65,26 +55,30 @@ import Network.Haskbot.Internal.Incoming (Incoming (Incoming), addToSendQueue)
 import Network.Haskbot.Internal.SlashCommand (SlashCom (..))
 import Network.Haskbot.Types
 
-data Plugin = Plugin { plCommand  :: {-# UNPACK #-} !Command
-                     , plHelpText :: {-# UNPACK #-} !Text
-                     , plHandler  ::                !HandlerFn
-                     , plToken    :: {-# UNPACK #-} !Token
-                     }
+data Plugin =
+  Plugin { plCommand  :: {-# UNPACK #-} !Command
+         -- ^ The command that invokes this plugin
+         , plHelpText :: {-# UNPACK #-} !Text
+         -- ^ Help text displayed for this plugin via
+         -- "Network.Haskbot.Plugin.Help"
+         , plHandler  ::                !HandlerFn
+         -- ^ The function that receives a "Network.Haskbot.SlashCommand"
+         -- and maybe returns a "Network.Haskbot.Incoming"
+         , plToken    :: {-# UNPACK #-} !Token
+         -- ^ The secret token corresponding with this plugin's /slash command/
+         -- Slack integration
+         }
 
 type NameStr   = Text
 type HelpStr   = Text
 type HandlerFn = SlashCom -> Haskbot (Maybe Incoming)
 type TokenStr  = Text
 
--- | Create a new 'Plugin' from the components
 newPlugin :: NameStr   -- ^ The text name of the plugin command
-          -> HelpStr   -- ^ Help text displayed in conjunction with the
-                       -- "Slack.Haskbot.Plugin.Help" plugin
-          -> HandlerFn -- ^ A function that takes a "Slack.Haskbot.SlashCommand"
-                       -- and potentially returns a 'Incoming'
-          -> TokenStr  -- ^ The secret token of the Slack /slash command/
-                       -- integration associated with this plugin
-          -> Plugin
+          -> HelpStr   -- ^ (see 'plHelpText')
+          -> HandlerFn -- ^ (see 'plHandler')
+          -> TokenStr  -- ^ The text value of the /slash command/ secret token
+          -> Plugin    -- ^ Creates a plugin to be run by Haskbot
 newPlugin com help handler token =
   Plugin (setCommand com) help handler (setToken token)
 
