@@ -2,8 +2,6 @@
 
 module Network.Haskbot.Internal.Environment
 ( Haskbot
-, ActionH
-, ScottyH
 , Environment (..)
 , getAppEnv
 , getSlackEndpoint
@@ -16,11 +14,8 @@ import qualified Data.Text.Lazy as TL
 import qualified Network.Connection as N
 import qualified Network.HTTP.Conduit as N
 import System.Environment (getEnv)
-import Web.Scotty.Trans (ActionT, ScottyT)
 
 type Haskbot = ReaderT Environment IO
-type ScottyH = ScottyT TL.Text Haskbot
-type ActionH = ActionT TL.Text Haskbot
 
 data Environment = Environment { networkConn :: N.Manager
                                , incQueue    :: TVar [BL.ByteString]
