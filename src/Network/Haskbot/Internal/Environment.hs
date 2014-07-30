@@ -8,14 +8,16 @@ module Network.Haskbot.Internal.Environment
 ) where
 
 import Control.Concurrent.STM.TVar (TVar, newTVarIO)
+import Control.Monad.Error (ErrorT)
 import Control.Monad.Reader (ReaderT)
 import qualified Data.ByteString.Lazy as BL
 import qualified Data.Text.Lazy as TL
 import qualified Network.Connection as N
 import qualified Network.HTTP.Conduit as N
+import qualified Network.Wai as W
 import System.Environment (getEnv)
 
-type Haskbot = ReaderT Environment IO
+type Haskbot = ReaderT Environment (ErrorT W.Response IO)
 
 data Environment = Environment { networkConn :: N.Manager
                                , incQueue    :: TVar [BL.ByteString]
