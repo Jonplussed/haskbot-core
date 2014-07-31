@@ -1,3 +1,5 @@
+{-# LANGUAGE OverloadedStrings #-}
+
 -- | This provides a representation of the request data from a Slack /slash
 --   command/ integration. A "Network.Haskbot.Plugin" handler function is given
 --   direct access to this data type when a /slash command/ is invoked via
@@ -6,10 +8,15 @@ module Network.Haskbot.SlashCommand
 (
   -- * The SlashCom type
   SlashCom (..)
+, fromParams
 ) where
 
-import Data.Text
+import Control.Applicative ((<$>), (<*>))
+import Data.Text (Text)
+import Network.Haskbot.Internal.Environment (HaskbotM)
+import Network.Haskbot.Internal.Request
 import Network.Haskbot.Types
+import Network.Wai (Request)
 
 -- | Encapsulates all data provided by a request from a Slack /slash command/
 -- integration
@@ -29,6 +36,37 @@ data SlashCom
   -- ^ the username of the command invoker
   , command     :: {-# UNPACK #-} !Command
   -- ^ the name of the command invoked
-  , text        :: {-# UNPACK #-} !Text
+  , optText     ::  Maybe Text
   -- ^ any text following the invoked slash command
   } deriving (Eq, Show)
+
+-- internal functions
+
+fromParams :: Request -> HaskbotM SlashCom
+fromParams req =
+    newSlashCom <$> reqParam' "token"
+                <*> reqParam' "team_id"
+                <*> reqParam' "channel_id"
+                <*> reqParam' "channel_name"
+                <*> reqParam' "user_id"
+                <*> reqParam' "user_name"
+                <*> reqParam' "command"
+                <*> optParam' "text"
+  where
+    reqParam' = reqParam params
+    optParam' = optParam params
+    params    = paramsMap req
+
+-- private functions
+
+newSlashCom :: Text -> Text -> Text -> Text
+            -> Text -> Text -> Text -> Maybe Text
+            -> SlashCom
+newSlashCom a b c d e f g =
+  SlashCom (setToken a)
+           (setTeamID b)
+           (setChanID c)
+           (setChanName d)
+           (setUserID e)
+           (setUserName f)
+           (setCommand g)
