@@ -14,12 +14,14 @@ import Control.Concurrent (threadDelay)
 import Control.Concurrent.STM (atomically)
 import Control.Concurrent.STM.TVar (modifyTVar', readTVar)
 import Control.Monad (forever)
+import Control.Monad.Error (runErrorT)
 import Control.Monad.Reader (ask, liftIO)
 import Data.Aeson (ToJSON, (.=), encode, object, toJSON)
 import qualified Data.ByteString.Lazy as BL
 import Data.Text (Text)
 import Network.Haskbot.Internal.Environment
-  (Haskbot, getSlackEndpoint, incQueue, networkConn)
+  (HaskbotM, getSlackEndpoint, incQueue, networkConn)
+import Network.Haskbot.Internal.Request (jsonContentType)
 import Network.Haskbot.Types (Channel, getAddress)
 import Network.HTTP.Conduit -- basically everything
 import Network.HTTP.Types (Header, methodPost, status200)
@@ -38,23 +40,20 @@ instance ToJSON Incoming where
 
 -- constants
 
-jsonContentType :: Header
-jsonContentType = ("Content-Type", "application/json")
-
 timeBetweenSends :: Int
 timeBetweenSends = 1000000 -- Slack rate limit
 
 -- internal functions
 
-addToSendQueue :: Incoming -> Haskbot ()
+addToSendQueue :: Incoming -> HaskbotM ()
 addToSendQueue inc = enqueueMsg . encode $ toJSON inc
 
-sendFromQueue :: Haskbot ()
+sendFromQueue :: HaskbotM ()
 sendFromQueue = forever $ dequeueMsg >>= sendMsg >> wait
 
 -- private functions
 
-incRequest :: Haskbot Request
+incRequest :: HaskbotM Request
 incRequest = do
     endpoint    <- liftIO getSlackEndpoint
     initRequest <- liftIO $ parseUrl endpoint
@@ -64,12 +63,12 @@ incRequest = do
       , requestHeaders    = [jsonContentType]
       }
 
-handleResp :: BL.ByteString -> Response a -> Haskbot ()
+handleResp :: BL.ByteString -> Response a -> HaskbotM ()
 handleResp msg resp
   | responseStatus resp == status200 = return ()
   | otherwise = enqueueMsg msg -- should also log failure
 
-sendMsg :: Maybe BL.ByteString -> Haskbot ()
+sendMsg :: Maybe BL.ByteString -> HaskbotM ()
 sendMsg (Just msg) = do
     env <- ask
     template <- incRequest
@@ -77,15 +76,15 @@ sendMsg (Just msg) = do
     liftIO (httpLbs newRequest $ networkConn env) >>= handleResp msg
 sendMsg _ = return ()
 
-wait :: Haskbot ()
+wait :: HaskbotM ()
 wait = liftIO $ threadDelay timeBetweenSends
 
-enqueueMsg :: BL.ByteString -> Haskbot ()
+enqueueMsg :: BL.ByteString -> HaskbotM ()
 enqueueMsg msg = do
     env <- ask
     liftIO . atomically $ modifyTVar' (incQueue env) (\q -> q ++ [msg])
 
-dequeueMsg :: Haskbot (Maybe BL.ByteString)
+dequeueMsg :: HaskbotM (Maybe BL.ByteString)
 dequeueMsg = do
     env <- ask
     liftIO . atomically $ do

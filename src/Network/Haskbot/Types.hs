@@ -26,10 +26,14 @@ module Network.Haskbot.Types
 
 import qualified Data.Text as T
 
+-- constants
+
 prefixChan, prefixCom, prefixUser :: Char
 prefixChan = '#'
 prefixCom  = '/'
 prefixUser = '@'
+
+-- public functions
 
 newtype Token
   = Token { getToken :: T.Text -- ^ get the text of a token
