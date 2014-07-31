@@ -2,27 +2,33 @@
 
 module Network.Haskbot.Internal.Environment
 ( HaskbotM
-, ActionM
 , Environment (..)
 , getAppEnv
 , getSlackEndpoint
 ) where
 
 import Control.Concurrent.STM.TVar (TVar, newTVarIO)
-import Control.Monad.Error (ErrorT)
+import Control.Monad.Error (Error, ErrorT)
+import Control.Monad.Error.Class (noMsg, strMsg)
 import Control.Monad.Reader (ReaderT)
+import qualified Data.ByteString.Char8 as B8
 import qualified Data.ByteString.Lazy as BL
 import Data.Text (Text)
 import qualified Network.Connection as N
 import qualified Network.HTTP.Conduit as N
-import System.Environment (getEnv)
+import Network.HTTP.Types (Status, internalServerError500, mkStatus)
 
-type HaskbotM = ReaderT Environment ActionM
-type ActionM = ErrorT String IO
+import System.Environment (getEnv)
 
 data Environment = Environment { networkConn :: N.Manager
                                , incQueue    :: TVar [BL.ByteString]
                                }
+
+type HaskbotM = ReaderT Environment (ErrorT Status IO)
+
+instance Error Status where
+  noMsg  = internalServerError500
+  strMsg = mkStatus 500 . B8.pack
 
 -- constants
 
