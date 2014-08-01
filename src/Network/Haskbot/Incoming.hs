@@ -1,7 +1,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 
 -- | This provides a simple representation of the request data for a Slack
---   /incoming/ integration- the means via which Haskbot replies to Slack.
+--   /incoming/ integration- the means via which HaskbotM replies to Slack.
 --   Currently only simple text replies are supported, but this will be expanded
 --   to support fully-slack-formatted messages in the future.
 module Network.Haskbot.Incoming
@@ -14,17 +14,18 @@ import Control.Concurrent (threadDelay)
 import Control.Concurrent.STM (atomically)
 import Control.Concurrent.STM.TVar (modifyTVar', readTVar)
 import Control.Monad (forever)
-import Control.Monad.Error (runErrorT)
-import Control.Monad.Reader (ask, liftIO)
+import Control.Monad.Reader (MonadIO, ReaderT, asks, liftIO)
 import Data.Aeson (ToJSON, (.=), encode, object, toJSON)
-import qualified Data.ByteString.Lazy as BL
+import Data.ByteString.Lazy (ByteString)
 import Data.Text (Text)
 import Network.Haskbot.Internal.Environment
-  (HaskbotM, getSlackEndpoint, incQueue, networkConn)
+  (Environment, getSlackEndpoint, incQueue, networkConn)
 import Network.Haskbot.Internal.Request (jsonContentType)
 import Network.Haskbot.Types (Channel, getAddress)
 import Network.HTTP.Conduit -- basically everything
-import Network.HTTP.Types (Header, methodPost, status200)
+import Network.HTTP.Types (methodPost, status200)
+
+type EnvironM m = ReaderT Environment m
 
 data Incoming =
   Incoming { incChan :: !Channel
@@ -45,15 +46,15 @@ timeBetweenSends = 1000000 -- Slack rate limit
 
 -- internal functions
 
-addToSendQueue :: Incoming -> HaskbotM ()
+addToSendQueue :: (MonadIO m) => Incoming -> EnvironM m ()
 addToSendQueue inc = enqueueMsg . encode $ toJSON inc
 
-sendFromQueue :: HaskbotM ()
+sendFromQueue :: (MonadIO m) => EnvironM m ()
 sendFromQueue = forever $ dequeueMsg >>= sendMsg >> wait
 
 -- private functions
 
-incRequest :: HaskbotM Request
+incRequest :: (MonadIO m) => EnvironM m Request
 incRequest = do
     endpoint    <- liftIO getSlackEndpoint
     initRequest <- liftIO $ parseUrl endpoint
@@ -63,34 +64,41 @@ incRequest = do
       , requestHeaders    = [jsonContentType]
       }
 
-handleResp :: BL.ByteString -> Response a -> HaskbotM ()
-handleResp msg resp
-  | responseStatus resp == status200 = return ()
-  | otherwise = enqueueMsg msg -- should also log failure
+-- TODO:
+-- 1. If the message queue extends beyond a certain count, Slack is
+--    probably down and we should halt adding to the queue until it returns.
+-- 2. Log any failed responses
 
-sendMsg :: Maybe BL.ByteString -> HaskbotM ()
+handleResp :: (MonadIO m) => ByteString -> Response a -> EnvironM m ()
+handleResp msg resp
+    | allGood   = return ()
+    | otherwise = enqueueMsg msg
+  where
+    allGood = responseStatus resp == status200
+
+sendMsg :: (MonadIO m) => Maybe ByteString -> EnvironM m ()
 sendMsg (Just msg) = do
-    env <- ask
+    conn <- asks networkConn
     template <- incRequest
     let newRequest = template { requestBody = RequestBodyLBS msg }
-    liftIO (httpLbs newRequest $ networkConn env) >>= handleResp msg
+    liftIO (httpLbs newRequest conn) >>= handleResp msg
 sendMsg _ = return ()
 
-wait :: HaskbotM ()
+wait :: (MonadIO m) => EnvironM m ()
 wait = liftIO $ threadDelay timeBetweenSends
 
-enqueueMsg :: BL.ByteString -> HaskbotM ()
+enqueueMsg :: (MonadIO m) => ByteString -> EnvironM m ()
 enqueueMsg msg = do
-    env <- ask
-    liftIO . atomically $ modifyTVar' (incQueue env) (\q -> q ++ [msg])
+    queue <- asks incQueue
+    liftIO . atomically $ modifyTVar' queue $ \q -> q ++ [msg]
 
-dequeueMsg :: HaskbotM (Maybe BL.ByteString)
+dequeueMsg :: (MonadIO m) => EnvironM m (Maybe ByteString)
 dequeueMsg = do
-    env <- ask
+    queue <- asks incQueue
     liftIO . atomically $ do
-        msgs <- readTVar $ incQueue env
+        msgs <- readTVar queue
         case msgs of
           (m:ms) -> do
-            modifyTVar' (incQueue env) (\q -> tail q)
+            modifyTVar' queue $ \q -> tail q
             return $ Just m
           _ -> return Nothing
