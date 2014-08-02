@@ -35,7 +35,7 @@ this means your package manager probably provides it for you.
      sudo apt-get update
      sudo apt-get install haskell-platform
      ```
-   - On OSX
+   - On OSX (via [Homebrew](http://brew.sh/))
 
      ```sh
      brew update
