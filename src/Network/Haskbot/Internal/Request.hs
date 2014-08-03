@@ -1,15 +1,24 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Network.Haskbot.Internal.Request where
+module Network.Haskbot.Internal.Request
+( Params
+, jsonContentType
+, textContentType
+, getPostParams
+, headOnly
+, paramsMap
+, optParam
+, reqParam
+) where
 
 import Control.Monad.Error (throwError)
 import Data.ByteString.Lazy (fromStrict)
-import Data.Text (Text, unpack)
+import Data.Text (Text)
 import Data.Text.Encoding (decodeUtf8)
 import qualified Data.Map as M
 import qualified Network.HTTP.Types as N
 import qualified Network.Wai as W
-import Network.Haskbot.Internal.Environment
+import Network.Haskbot.Internal.Environment (HaskbotM)
 
 type Params = M.Map Text Text
 

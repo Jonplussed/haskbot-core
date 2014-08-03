@@ -14,11 +14,9 @@ import Control.Monad.Error.Class (noMsg, strMsg)
 import Control.Monad.Reader (ReaderT)
 import qualified Data.ByteString.Char8 as B8
 import qualified Data.ByteString.Lazy as BL
-import Data.Text (Text)
 import qualified Network.Connection as N
 import qualified Network.HTTP.Conduit as N
 import Network.HTTP.Types (Status, internalServerError500, mkStatus)
-
 import System.Environment (getEnv)
 
 data Environment = Environment { networkConn :: N.Manager

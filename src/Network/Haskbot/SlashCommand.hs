@@ -14,7 +14,7 @@ module Network.Haskbot.SlashCommand
 import Control.Applicative ((<$>), (<*>))
 import Data.Text (Text)
 import Network.Haskbot.Internal.Environment (HaskbotM)
-import Network.Haskbot.Internal.Request
+import Network.Haskbot.Internal.Request (Params, reqParam, optParam)
 import Network.Haskbot.Types
 import Network.Wai (Request)
 

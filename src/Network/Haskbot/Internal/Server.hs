@@ -1,21 +1,20 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Network.Haskbot.Internal.Server where
+module Network.Haskbot.Internal.Server
+( webServer
+) where
 
 import Control.Concurrent (forkIO)
-import Control.Monad.Error (ErrorT, runErrorT, catchError, throwError)
-import Control.Monad.Reader (ReaderT, lift, liftIO, runReaderT)
-import qualified Data.Map as M
-import qualified Data.Text.Lazy as TL
-import Data.Time.Clock.POSIX (getPOSIXTime)
+import Control.Monad.Error (runErrorT, throwError)
+import Control.Monad.Reader (runReaderT)
 import Network.Haskbot.Internal.Environment (HaskbotM, Environment, getAppEnv)
-import Network.Haskbot.Internal.Request (Params, getPostParams, headOnly, paramsMap)
+import Network.Haskbot.Internal.Request (getPostParams, headOnly, paramsMap)
 import Network.Haskbot.Incoming (sendFromQueue)
 import Network.Haskbot.Plugin (Plugin, isAuthorized, runPlugin, selectFrom)
 import Network.Haskbot.SlashCommand (SlashCom, command, fromParams)
-import qualified Network.HTTP.Types as N
-import qualified Network.Wai as W
-import qualified Network.Wai.Handler.Warp as W
+import Network.HTTP.Types (ok200, badRequest400, unauthorized401)
+import Network.Wai (Request, Response)
+import Network.Wai.Handler.Warp (run)
 
 -- internal functions
 
@@ -32,16 +31,16 @@ sendResponsesToSlack = runReaderT sendFromQueue
 
 processSlackRequests :: [Plugin] -> Int -> Environment -> IO ()
 processSlackRequests plugins port env =
-  W.run port $ \req resp -> runner plugins env req >>= resp
+  run port $ \req resp -> runner plugins env req >>= resp
 
-runner :: [Plugin] -> Environment -> W.Request -> IO W.Response
+runner :: [Plugin] -> Environment -> Request -> IO Response
 runner plugins env req = do
   ranOrFailed <- runErrorT $ runReaderT (pipeline plugins req) env
   case ranOrFailed of
-    Right _          -> return $ headOnly N.ok200
+    Right _          -> return $ headOnly ok200
     Left errorStatus -> return $ headOnly errorStatus
 
-pipeline :: [Plugin] -> W.Request -> HaskbotM ()
+pipeline :: [Plugin] -> Request -> HaskbotM ()
 pipeline plugins req = getPostParams req >>= fromParams >>= findAndRun plugins
 
 findAndRun :: [Plugin] -> SlashCom -> HaskbotM ()
@@ -50,5 +49,5 @@ findAndRun plugins slashCom =
     Just plugin ->
       if isAuthorized plugin slashCom
       then runPlugin plugin slashCom
-      else throwError N.unauthorized401
-    _ -> throwError N.badRequest400
+      else throwError unauthorized401
+    _ -> throwError badRequest400

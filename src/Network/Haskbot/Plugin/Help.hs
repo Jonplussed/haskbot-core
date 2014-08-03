@@ -2,11 +2,11 @@
 
 module Network.Haskbot.Plugin.Help (register) where
 
+import Control.Applicative ((<$>))
 import Data.List (find)
 import qualified Data.Text as T
-import Network.Haskbot.Internal.Plugin (selectFrom)
 import Network.Haskbot.Plugin
-import Network.Haskbot.SlashCommand (text)
+import Network.Haskbot.SlashCommand (optText)
 import Network.Haskbot.Types (getCommand, setCommand)
 
 -- constants
@@ -26,15 +26,15 @@ register = newPlugin name helpText . handler
 
 -- private functions
 
-getHelp :: [Plugin] -> [T.Text] -> T.Text
-getHelp plugins []          = listAllText plugins
-getHelp plugins (comName:_) =
+getHelp :: [Plugin] -> Maybe [T.Text] -> T.Text
+getHelp plugins (Just [comName]) =
   maybe (listAllText plugins) plHelpText
     (selectFrom plugins $ setCommand comName)
+getHelp plugins _                = listAllText plugins
 
 handler :: [Plugin] -> HandlerFn
 handler plugins slashCom = return $ replyAsDM slashCom reply
-  where reply = getHelp plugins . T.words $ text slashCom
+  where reply = getHelp plugins $ T.words <$> optText slashCom
 
 listAllText :: [Plugin] -> T.Text
 listAllText plugins =
