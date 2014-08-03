@@ -1,8 +1,9 @@
 {-# LANGUAGE RecordWildCards #-}
 
 module Network.Haskbot.Internal.Environment
-( HaskbotM
-, Environment (..)
+( Environment (..)
+, EnvironM
+, HaskbotM
 , getAppEnv
 , getSlackEndpoint
 ) where
@@ -24,7 +25,8 @@ data Environment = Environment { networkConn :: N.Manager
                                , incQueue    :: TVar [BL.ByteString]
                                }
 
-type HaskbotM = ReaderT Environment (ErrorT Status IO)
+type EnvironM m = ReaderT Environment m
+type HaskbotM = EnvironM (ErrorT Status IO)
 
 instance Error Status where
   noMsg  = internalServerError500

@@ -42,8 +42,8 @@ data SlashCom
 
 -- internal functions
 
-fromParams :: Request -> HaskbotM SlashCom
-fromParams req =
+fromParams :: Params -> HaskbotM SlashCom
+fromParams params =
     newSlashCom <$> reqParam' "token"
                 <*> reqParam' "team_id"
                 <*> reqParam' "channel_id"
@@ -55,7 +55,6 @@ fromParams req =
   where
     reqParam' = reqParam params
     optParam' = optParam params
-    params    = paramsMap req
 
 -- private functions
 

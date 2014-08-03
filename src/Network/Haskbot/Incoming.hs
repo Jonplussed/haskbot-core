@@ -19,13 +19,11 @@ import Data.Aeson (ToJSON, (.=), encode, object, toJSON)
 import Data.ByteString.Lazy (ByteString)
 import Data.Text (Text)
 import Network.Haskbot.Internal.Environment
-  (Environment, getSlackEndpoint, incQueue, networkConn)
+  (EnvironM, Environment, getSlackEndpoint, incQueue, networkConn)
 import Network.Haskbot.Internal.Request (jsonContentType)
 import Network.Haskbot.Types (Channel, getAddress)
 import Network.HTTP.Conduit -- basically everything
 import Network.HTTP.Types (methodPost, status200)
-
-type EnvironM m = ReaderT Environment m
 
 data Incoming =
   Incoming { incChan :: !Channel
