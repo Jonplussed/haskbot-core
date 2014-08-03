@@ -31,10 +31,8 @@ library
   exposed-modules:    Network.Haskbot
                       Network.Haskbot.Incoming
                       Network.Haskbot.Internal.Environment
-                      Network.Haskbot.Internal.Incoming
-                      Network.Haskbot.Internal.Plugin
+                      Network.Haskbot.Internal.Request
                       Network.Haskbot.Internal.Server
-                      Network.Haskbot.Internal.SlashCommand
                       Network.Haskbot.Plugin
                       Network.Haskbot.Plugin.Help
                       Network.Haskbot.SlashCommand
@@ -46,13 +44,14 @@ library
                       base         == 4.6.*,
                       bytestring   == 0.10.*,
                       connection   == 0.2.*,
+                      containers   == 0.5.*,
                       http-conduit == 2.1.*,
                       http-types   == 0.8.*,
                       monads-tf    == 0.1.*,
-                      scotty       == 0.8.*,
                       stm          == 2.4.*,
                       text         == 0.11.*,
-                      time         == 1.4.*
+                      wai          == 3.0.*,
+                      warp         == 3.0.*
 
 test-suite            spec
   hs-source-dirs:     src, test
@@ -65,11 +64,12 @@ test-suite            spec
                       base         == 4.6.*,
                       bytestring   == 0.10.*,
                       connection   == 0.2.*,
+                      containers   == 0.5.*,
                       hspec        == 1.8.*,
                       http-conduit == 2.1.*,
                       http-types   == 0.8.*,
                       monads-tf    == 0.1.*,
-                      scotty       == 0.8.*,
                       stm          == 2.4.*,
                       text         == 0.11.*,
-                      time         == 1.4.*
+                      wai          == 3.0.*,
+                      warp         == 3.0.*
