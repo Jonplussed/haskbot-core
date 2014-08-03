@@ -47,12 +47,17 @@ module Network.Haskbot.Plugin
 , newPlugin
 -- * Common Slack replies
 , replySameChan, replyAsDM
+-- * Internal
+, isAuthorized
+, runPlugin
+, selectFrom
 ) where
 
+import Data.List (find)
 import Data.Text (Text)
-import Network.Haskbot.Internal.Environment (Haskbot)
-import Network.Haskbot.Internal.Incoming (Incoming (Incoming), addToSendQueue)
-import Network.Haskbot.Internal.SlashCommand (SlashCom (..))
+import Network.Haskbot.Incoming (Incoming (Incoming), addToSendQueue)
+import Network.Haskbot.Internal.Environment (HaskbotM)
+import Network.Haskbot.SlashCommand (SlashCom (..), token)
 import Network.Haskbot.Types
 
 data Plugin =
@@ -71,7 +76,7 @@ data Plugin =
 
 type NameStr   = Text
 type HelpStr   = Text
-type HandlerFn = SlashCom -> Haskbot (Maybe Incoming)
+type HandlerFn = SlashCom -> HaskbotM (Maybe Incoming)
 type TokenStr  = Text
 
 newPlugin :: NameStr   -- ^ The text name of the plugin command
@@ -92,3 +97,18 @@ replySameChan sc = Just . Incoming (Channel $ channelName sc)
 -- formatted according to <https://api.slack.com/docs/formatting Slack>
 replyAsDM :: SlashCom -> Text -> Maybe Incoming
 replyAsDM sc = Just . Incoming (DirectMsg $ userName sc)
+
+-- internal functions
+
+runPlugin :: Plugin -> SlashCom -> HaskbotM ()
+runPlugin p slashCom = do
+  reply <- plHandler p slashCom
+  case reply of
+    Just r -> addToSendQueue r
+    _      -> return ()
+
+isAuthorized :: Plugin -> SlashCom -> Bool
+isAuthorized plugin slashCom = plToken plugin == token slashCom
+
+selectFrom :: [Plugin] -> Command -> Maybe Plugin
+selectFrom list com = find (\p -> plCommand p == com) list

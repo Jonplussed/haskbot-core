@@ -24,12 +24,11 @@
 module Network.Haskbot
 (
 -- * Run a Haskbot server
-  Haskbot, haskbot
+  haskbot
 ) where
 
-import Network.Haskbot.Internal.Environment (Haskbot)
 import Network.Haskbot.Internal.Server (webServer)
-import Network.Haskbot.Internal.Plugin (Plugin)
+import Network.Haskbot.Plugin (Plugin)
 
 -- | Run a Haskbot server with the listed plugins on the specified port.
 haskbot :: [Plugin] -- ^ List of all Haskbot plugins to include
