@@ -4,7 +4,7 @@ module Network.Haskbot.Internal.Request
 ( Params
 , jsonContentType
 , textContentType
-, getPostParams
+, getUrlParams
 , headOnly
 , paramsMap
 , optParam
@@ -18,7 +18,7 @@ import Data.Text.Encoding (decodeUtf8)
 import qualified Data.Map as M
 import qualified Network.HTTP.Types as N
 import qualified Network.Wai as W
-import Network.Haskbot.Internal.Monad (HaskbotM)
+import Network.Haskbot.Internal.Environment (HaskbotM)
 
 type Params = M.Map Text Text
 
@@ -41,12 +41,12 @@ paramsMap req = M.fromList $ map decode bsParams
     bsParams = N.parseSimpleQuery $ W.rawQueryString req
     decode (k,v) = (decodeUtf8 k, decodeUtf8 v)
 
-getPostParams :: W.Request -> HaskbotM Params
-getPostParams req
-    | isPost    = return $ paramsMap req
+getUrlParams :: W.Request -> HaskbotM Params
+getUrlParams req
+    | isGet     = return $ paramsMap req
     | otherwise = throwError N.badRequest400
   where
-    isPost = W.requestMethod req == N.methodPost
+    isGet = W.requestMethod req == N.methodGet
 
 optParam :: Params -> Text -> HaskbotM (Maybe Text)
 optParam pMap key = return $ M.lookup key pMap

@@ -57,7 +57,7 @@ import Control.Monad.Reader (lift)
 import Data.List (find)
 import Data.Text (Text)
 import Network.Haskbot.Incoming (Incoming (Incoming), addToSendQueue)
-import Network.Haskbot.Internal.Monad (HaskbotM)
+import Network.Haskbot.Internal.Environment (HaskbotM)
 import Network.Haskbot.SlashCommand (SlashCom (..), token)
 import Network.Haskbot.Types
 

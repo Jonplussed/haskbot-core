@@ -18,8 +18,9 @@ import Control.Monad.Reader (MonadIO, asks, liftIO)
 import Data.Aeson (ToJSON, (.=), encode, object, toJSON)
 import Data.ByteString.Lazy (ByteString)
 import Data.Text (Text)
-import Network.Haskbot.Config (incQueue, incUrl, netConn)
-import Network.Haskbot.Internal.Monad (ConfigT)
+import Network.Haskbot.Config (incUrl)
+import Network.Haskbot.Internal.Environment
+  (EnvironT, config, incQueue, netConn)
 import Network.Haskbot.Internal.Request (jsonContentType)
 import Network.Haskbot.Types (Channel, getAddress)
 import Network.HTTP.Conduit -- basically everything
@@ -44,17 +45,17 @@ timeBetweenSends = 1000000 -- Slack rate limit
 
 -- internal functions
 
-addToSendQueue :: (MonadIO m) => Incoming -> ConfigT m ()
+addToSendQueue :: (MonadIO m) => Incoming -> EnvironT m ()
 addToSendQueue inc = enqueueMsg . encode $ toJSON inc
 
-sendFromQueue :: (MonadIO m) => ConfigT m ()
+sendFromQueue :: (MonadIO m) => EnvironT m ()
 sendFromQueue = forever $ dequeueMsg >>= sendMsg >> wait
 
 -- private functions
 
-incRequest :: (MonadIO m) => ConfigT m Request
+incRequest :: (MonadIO m) => EnvironT m Request
 incRequest = do
-    url <- asks incUrl
+    url <- asks $ incUrl . config
     initRequest <- liftIO $ parseUrl url
     return $ initRequest
       { method            = methodPost
@@ -67,12 +68,12 @@ incRequest = do
 --    probably down and we should halt adding to the queue until it returns.
 -- 2. Log any failed responses
 
-enqueueMsg :: (MonadIO m) => ByteString -> ConfigT m ()
+enqueueMsg :: (MonadIO m) => ByteString -> EnvironT m ()
 enqueueMsg msg = do
     queue <- asks incQueue
     liftIO . atomically $ modifyTVar' queue $ \q -> q ++ [msg]
 
-dequeueMsg :: (MonadIO m) => ConfigT m (Maybe ByteString)
+dequeueMsg :: (MonadIO m) => EnvironT m (Maybe ByteString)
 dequeueMsg = do
     queue <- asks incQueue
     liftIO . atomically $ do
@@ -83,7 +84,7 @@ dequeueMsg = do
             return $ Just m
           _ -> return Nothing
 
-sendMsg :: (MonadIO m) => Maybe ByteString -> ConfigT m ()
+sendMsg :: (MonadIO m) => Maybe ByteString -> EnvironT m ()
 sendMsg (Just msg) = do
     conn <- asks netConn
     template <- incRequest
@@ -91,12 +92,12 @@ sendMsg (Just msg) = do
     liftIO (httpLbs newRequest conn) >>= handleResp msg
 sendMsg _ = return ()
 
-handleResp :: (MonadIO m) => ByteString -> Response a -> ConfigT m ()
+handleResp :: (MonadIO m) => ByteString -> Response a -> EnvironT m ()
 handleResp msg resp
     | allGood   = return ()
     | otherwise = enqueueMsg msg
   where
     allGood = responseStatus resp == status200
 
-wait :: (MonadIO m) => ConfigT m ()
+wait :: (MonadIO m) => EnvironT m ()
 wait = liftIO $ threadDelay timeBetweenSends

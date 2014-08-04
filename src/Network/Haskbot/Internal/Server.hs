@@ -8,8 +8,9 @@ import Control.Concurrent (forkIO)
 import Control.Monad.Error (runErrorT, throwError)
 import Control.Monad.Reader (runReaderT)
 import Network.Haskbot.Config (Config, listenOn)
-import Network.Haskbot.Internal.Monad (HaskbotM)
-import Network.Haskbot.Internal.Request (getPostParams, headOnly, paramsMap)
+import Network.Haskbot.Internal.Environment
+  (Environment, HaskbotM, bootstrap, config)
+import Network.Haskbot.Internal.Request (getUrlParams, headOnly, paramsMap)
 import Network.Haskbot.Incoming (sendFromQueue)
 import Network.Haskbot.Plugin (Plugin, isAuthorized, runPlugin, selectFrom)
 import Network.Haskbot.SlashCommand (SlashCom, command, fromParams)
@@ -21,27 +22,30 @@ import Network.Wai.Handler.Warp (run)
 
 webServer :: Config -> [Plugin] -> IO ()
 webServer config plugins = do
-    forkIO $ sendResponsesToSlack config
-    processSlackRequests config plugins
+    env <- bootstrap config
+    forkIO $ sendResponsesToSlack env
+    processSlackRequests env plugins
 
 -- private functions
 
-sendResponsesToSlack :: Config -> IO ()
+sendResponsesToSlack :: Environment -> IO ()
 sendResponsesToSlack = runReaderT sendFromQueue
 
-processSlackRequests :: Config -> [Plugin] -> IO ()
-processSlackRequests config plugins =
-  run (listenOn config) (\req resp -> runner config plugins req >>= resp)
+processSlackRequests :: Environment -> [Plugin] -> IO ()
+processSlackRequests env plugins = run port app
+  where
+    port = listenOn $ config env
+    app req resp = runner env plugins req >>= resp
 
-runner :: Config -> [Plugin] -> Request -> IO Response
-runner config plugins req = do
-  ranOrFailed <- runErrorT $ runReaderT (pipeline plugins req) config
+runner :: Environment -> [Plugin] -> Request -> IO Response
+runner env plugins req = do
+  ranOrFailed <- runErrorT $ runReaderT (pipeline plugins req) env
   case ranOrFailed of
     Right _          -> return $ headOnly ok200
     Left errorStatus -> return $ headOnly errorStatus
 
 pipeline :: [Plugin] -> Request -> HaskbotM ()
-pipeline plugins req = getPostParams req >>= fromParams >>= findAndRun plugins
+pipeline plugins req = getUrlParams req >>= fromParams >>= findAndRun plugins
 
 findAndRun :: [Plugin] -> SlashCom -> HaskbotM ()
 findAndRun plugins slashCom =
