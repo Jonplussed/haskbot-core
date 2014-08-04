@@ -1,5 +1,5 @@
 name:                 haskbot-core
-version:              0.0.1.1
+version:              0.0.1.2
 maintainer:           Jonathan Childress <jon@childr.es>
 homepage:             https://github.com/jonplussed/haskbot-core
 
@@ -29,8 +29,9 @@ source-repository     head
 library
   hs-source-dirs:     src
   exposed-modules:    Network.Haskbot
+                      Network.Haskbot.Config
                       Network.Haskbot.Incoming
-                      Network.Haskbot.Internal.Environment
+                      Network.Haskbot.Internal.Monad
                       Network.Haskbot.Internal.Request
                       Network.Haskbot.Internal.Server
                       Network.Haskbot.Plugin

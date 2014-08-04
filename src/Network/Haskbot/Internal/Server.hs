@@ -7,7 +7,8 @@ module Network.Haskbot.Internal.Server
 import Control.Concurrent (forkIO)
 import Control.Monad.Error (runErrorT, throwError)
 import Control.Monad.Reader (runReaderT)
-import Network.Haskbot.Internal.Environment (HaskbotM, Environment, getAppEnv)
+import Network.Haskbot.Config (Config, listenOn)
+import Network.Haskbot.Internal.Monad (HaskbotM)
 import Network.Haskbot.Internal.Request (getPostParams, headOnly, paramsMap)
 import Network.Haskbot.Incoming (sendFromQueue)
 import Network.Haskbot.Plugin (Plugin, isAuthorized, runPlugin, selectFrom)
@@ -18,24 +19,23 @@ import Network.Wai.Handler.Warp (run)
 
 -- internal functions
 
-webServer :: [Plugin] -> Int -> IO ()
-webServer plugins port = do
-    env <- getAppEnv
-    forkIO $ sendResponsesToSlack env
-    processSlackRequests plugins port env
+webServer :: Config -> [Plugin] -> IO ()
+webServer config plugins = do
+    forkIO $ sendResponsesToSlack config
+    processSlackRequests config plugins
 
 -- private functions
 
-sendResponsesToSlack :: Environment -> IO ()
+sendResponsesToSlack :: Config -> IO ()
 sendResponsesToSlack = runReaderT sendFromQueue
 
-processSlackRequests :: [Plugin] -> Int -> Environment -> IO ()
-processSlackRequests plugins port env =
-  run port $ \req resp -> runner plugins env req >>= resp
+processSlackRequests :: Config -> [Plugin] -> IO ()
+processSlackRequests config plugins =
+  run (listenOn config) (\req resp -> runner config plugins req >>= resp)
 
-runner :: [Plugin] -> Environment -> Request -> IO Response
-runner plugins env req = do
-  ranOrFailed <- runErrorT $ runReaderT (pipeline plugins req) env
+runner :: Config -> [Plugin] -> Request -> IO Response
+runner config plugins req = do
+  ranOrFailed <- runErrorT $ runReaderT (pipeline plugins req) config
   case ranOrFailed of
     Right _          -> return $ headOnly ok200
     Left errorStatus -> return $ headOnly errorStatus

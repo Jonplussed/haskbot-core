@@ -28,10 +28,11 @@ module Network.Haskbot
 ) where
 
 import Network.Haskbot.Internal.Server (webServer)
+import Network.Haskbot.Config (Config)
 import Network.Haskbot.Plugin (Plugin)
 
--- | Run a Haskbot server with the listed plugins on the specified port.
-haskbot :: [Plugin] -- ^ List of all Haskbot plugins to include
-        -> Int      -- ^ Port on which to run Haskbot server
+-- | Run the listed plugins on a Haskbot server with the given config
+haskbot :: Config   -- ^ Port on which to run Haskbot server
+        -> [Plugin] -- ^ List of all Haskbot plugins to include
         -> IO ()
 haskbot = webServer
