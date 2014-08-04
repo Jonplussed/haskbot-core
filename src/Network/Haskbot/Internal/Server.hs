@@ -10,7 +10,7 @@ import Control.Monad.Reader (runReaderT)
 import Network.Haskbot.Config (Config, listenOn)
 import Network.Haskbot.Internal.Environment
   (Environment, HaskbotM, bootstrap, config)
-import Network.Haskbot.Internal.Request (getUrlParams, headOnly, paramsMap)
+import Network.Haskbot.Internal.Request (getPostParams, headOnly)
 import Network.Haskbot.Incoming (sendFromQueue)
 import Network.Haskbot.Plugin (Plugin, isAuthorized, runPlugin, selectFrom)
 import Network.Haskbot.SlashCommand (SlashCom, command, fromParams)
@@ -45,7 +45,7 @@ runner env plugins req = do
     Left errorStatus -> return $ headOnly errorStatus
 
 pipeline :: [Plugin] -> Request -> HaskbotM ()
-pipeline plugins req = getUrlParams req >>= fromParams >>= findAndRun plugins
+pipeline plugins req = getPostParams req >>= fromParams >>= findAndRun plugins
 
 findAndRun :: [Plugin] -> SlashCom -> HaskbotM ()
 findAndRun plugins slashCom =

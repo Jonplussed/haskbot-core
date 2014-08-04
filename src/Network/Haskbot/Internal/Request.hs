@@ -4,14 +4,14 @@ module Network.Haskbot.Internal.Request
 ( Params
 , jsonContentType
 , textContentType
-, getUrlParams
+, getPostParams
 , headOnly
-, paramsMap
+, getParamsMap
 , optParam
 , reqParam
 ) where
 
-import Control.Monad.Error (throwError)
+import Control.Monad.Error (liftIO, throwError)
 import Data.ByteString.Lazy (fromStrict)
 import Data.Text (Text)
 import Data.Text.Encoding (decodeUtf8)
@@ -35,18 +35,19 @@ textContentType = (N.hContentType, "text/plain")
 headOnly :: N.Status -> W.Response
 headOnly status = W.responseLBS status [] . fromStrict $ N.statusMessage status
 
-paramsMap :: W.Request -> Params
-paramsMap req = M.fromList $ map decode bsParams
+getParamsMap :: W.Request -> IO Params
+getParamsMap req = do
+    body <- W.requestBody req
+    return . M.fromList . map decode $ N.parseSimpleQuery body
   where
-    bsParams = N.parseSimpleQuery $ W.rawQueryString req
     decode (k,v) = (decodeUtf8 k, decodeUtf8 v)
 
-getUrlParams :: W.Request -> HaskbotM Params
-getUrlParams req
-    | isGet     = return $ paramsMap req
-    | otherwise = throwError N.badRequest400
+getPostParams :: W.Request -> HaskbotM Params
+getPostParams req
+    | isPost     = liftIO $ getParamsMap req
+    | otherwise = throwError N.status403
   where
-    isGet = W.requestMethod req == N.methodGet
+  isPost = W.requestMethod req == N.methodPost
 
 optParam :: Params -> Text -> HaskbotM (Maybe Text)
 optParam pMap key = return $ M.lookup key pMap
