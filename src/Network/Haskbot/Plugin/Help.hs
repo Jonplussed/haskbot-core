@@ -6,23 +6,23 @@ import Control.Applicative ((<$>))
 import Data.List (find)
 import qualified Data.Text as T
 import Network.Haskbot.Plugin
-import Network.Haskbot.SlashCommand (optText)
-import Network.Haskbot.Types (getCommand, setCommand)
+import Network.Haskbot.SlashCommand
+import Network.Haskbot.Types
 
 -- constants
 
-name :: NameStr
-name = "haskbot"
+name :: Command
+name = setCommand "haskbot"
 
-helpText :: HelpStr
+helpText :: T.Text
 helpText =
     "List all installed Plugins via `/haskbot`. To see the help text of a\
     \ particular Plugin, use `/haskbot [Plugin name]`."
 
 -- public functions
 
-register :: [Plugin] -> TokenStr -> Plugin
-register = newPlugin name helpText . handler
+register :: [Plugin] -> T.Text -> Plugin
+register plugins = Plugin name helpText (handler plugins) . setToken
 
 -- private functions
 

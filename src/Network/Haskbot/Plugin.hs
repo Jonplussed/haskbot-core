@@ -1,10 +1,6 @@
--- | Haskbot plugins are functions returning a 'Plugin' data type. The 'Plugin'
---   type is not exported directly; you should create new plugins via
---   'newPlugin'.
---
---   The recommended process for exporting plugins is to create a new module
+-- | The recommended process for exporting plugins is to create a new module
 --   that exports a single function currying the first three arguments to
---   'newPlugin'. The remaining argument, the Slack secret token, can be
+--   'Plugin'. The remaining argument, the Slack secret token, can be
 --   supplied in a separate file exporting the list of installed commands for
 --   Haskbot. This enables you to recreate a registry of installed tokens and
 --   corresponding secret tokens in a separate file outside of version control.
@@ -15,19 +11,21 @@
 -- >
 -- > module MyPlugins.HelloWorld (register) where
 -- >
+-- > import Data.Text
 -- > import Network.Haskbot.Plugin
+-- > import Network.Haskbot.Types
 -- >
--- > name :: NameStr
--- > name = "hello_world"
+-- > name :: Command
+-- > name = setCommand "hello_world"
 -- >
--- > helpText :: HelpStr
+-- > helpText :: Text
 -- > helpText = "Have Haskbot say _Hello, World!_ in your current channel."
 -- >
 -- > handler :: HandlerFn
 -- > handler slashCom = return $ replySameChan slashCom "Hello, World!"
 -- >
--- > register :: TokenStr -> Plugin
--- > register = newPlugin name helpText handler
+-- > register :: Text -> Plugin
+-- > register = Plugin name helpText handler . setToken
 --
 --   To run the plugin, create a new Slack /slash command/ integration
 --   corresponding to the command @\/hello_world@ that points to your Haskbot
@@ -40,16 +38,12 @@ module Network.Haskbot.Plugin
 (
 -- * The Plugin type
   Plugin (..)
--- * Creating Plugins
--- ** Helpful Type aliases
-, NameStr, HelpStr, HandlerFn, TokenStr
--- ** Creating a new Plugin
-, newPlugin
+, HandlerFn
 -- * Common Slack replies
 , replySameChan, replyAsDM
--- * Internal
-, isAuthorized
+-- internal use only
 , runPlugin
+, isAuthorized
 , selectFrom
 ) where
 
@@ -61,41 +55,33 @@ import Network.Haskbot.Internal.Environment (HaskbotM)
 import Network.Haskbot.SlashCommand (SlashCom (..), token)
 import Network.Haskbot.Types
 
+
+-- | The type of function run by a plugin. It receives the full
+--   "Network.Haskbot.SlashCommand" invoked and can optionally return a
+--   "Network.Haskbot.Incoming" reply
+type HandlerFn = SlashCom -> HaskbotM (Maybe Incoming)
+
 data Plugin =
   Plugin { plCommand  :: {-# UNPACK #-} !Command
          -- ^ The command that invokes this plugin
          , plHelpText :: {-# UNPACK #-} !Text
          -- ^ Help text displayed for this plugin via
-         -- "Network.Haskbot.Plugin.Help"
+         --   "Network.Haskbot.Plugin.Help"
          , plHandler  ::                !HandlerFn
-         -- ^ The function that receives a "Network.Haskbot.SlashCommand"
-         -- and maybe returns a "Network.Haskbot.Incoming"
+         -- ^ The function run when a 'Plugin' is invoked
          , plToken    :: {-# UNPACK #-} !Token
          -- ^ The secret token corresponding with this plugin's /slash command/
-         -- Slack integration
+         --   Slack integration
          }
 
-type NameStr   = Text
-type HelpStr   = Text
-type HandlerFn = SlashCom -> HaskbotM (Maybe Incoming)
-type TokenStr  = Text
-
-newPlugin :: NameStr   -- ^ The text name of the plugin command
-          -> HelpStr   -- ^ (see 'plHelpText')
-          -> HandlerFn -- ^ (see 'plHandler')
-          -> TokenStr  -- ^ The text value of the /slash command/ secret token
-          -> Plugin    -- ^ Creates a plugin to be run by Haskbot
-newPlugin com help handler token =
-  Plugin (setCommand com) help handler (setToken token)
-
 -- | Send a Slack reply to the same channel as where the corresponding /slash
--- command/ was invoked, formatted according to
--- <https://api.slack.com/docs/formatting Slack>
+--   command/ was invoked, formatted according to
+--   <https://api.slack.com/docs/formatting Slack>
 replySameChan :: SlashCom -> Text -> Maybe Incoming
 replySameChan sc = Just . Incoming (Channel $ channelName sc)
 
 -- | Send a Slack reply as a DM to the user who invoked the /slash command/,
--- formatted according to <https://api.slack.com/docs/formatting Slack>
+--   formatted according to <https://api.slack.com/docs/formatting Slack>
 replyAsDM :: SlashCom -> Text -> Maybe Incoming
 replyAsDM sc = Just . Incoming (DirectMsg $ userName sc)
 

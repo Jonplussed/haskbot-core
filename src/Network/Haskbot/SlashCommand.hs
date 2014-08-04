@@ -6,8 +6,9 @@
 --   Slack.
 module Network.Haskbot.SlashCommand
 (
-  -- * The SlashCom type
+-- * The Slash Command type
   SlashCom (..)
+-- internal use only
 , fromParams
 ) where
 

@@ -1,11 +1,14 @@
 {-# LANGUAGE OverloadedStrings #-}
 
 -- | This provides a simple representation of the request data for a Slack
---   /incoming/ integration- the means via which HaskbotM replies to Slack.
---   Currently only simple text replies are supported, but this will be expanded
---   to support fully-slack-formatted messages in the future.
+--   /incoming/ integration- the means via which Haskbot replies to Slack.
+--   Currently only simple text replies are supported, but this will be
+--   expanded to support fully-Slack-formatted messages in the future.
 module Network.Haskbot.Incoming
-( Incoming (..)
+(
+-- * The Incoming type
+  Incoming (..)
+-- internal use only
 , addToSendQueue
 , sendFromQueue
 ) where
