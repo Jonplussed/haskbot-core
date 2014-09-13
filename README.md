@@ -42,6 +42,9 @@ this means your package manager probably provides it for you.
      brew install haskell-platform
      ```
 
+  If instead you compile from source, be sure to add the GHC `bin` directory to
+  your path!
+
 2. Add Cabal's (the Haskell package manager) `bin` folder to your shell's
    `$PATH`. This is usually done by adding the following lines to
    `~/.profile` or `~/.bash_profile` (whichever you have/prefer).
@@ -69,9 +72,18 @@ Haskbot API description and examples.
 
 ### Thanks
 
+I couldn't have completed this without the guidance provided by
+[Chris Wilson](https://github.com/twopoint718). I've learned as much from our
+conversations on Haskell and functional programming as I have from any book.
+
 I wouldn't have had time to write this without the growth time supplied by
 [Bendyworks](http://bendyworks.com/). Hey, employers! This is what developers
 need to survive.
+
+Finally, I never would have discovered Haskell had
+[Rob Jones](https://github.com/jonesdeini) not jokingly told me to build a web
+service using [Snap](http://snapframework.com/) when I stated that I wanted to
+branch out from Ruby. Gaze upon your works, ye mighty!
 
 ### License
 
