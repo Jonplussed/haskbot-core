@@ -1,8 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Network.Haskbot.Internal.Server
-( webServer
-) where
+module Network.Haskbot.Internal.Server where
 
 import Control.Concurrent (forkIO)
 import Control.Monad.Error (runErrorT, throwError)
@@ -15,7 +13,7 @@ import Network.Haskbot.Incoming (sendFromQueue)
 import Network.Haskbot.Plugin (Plugin, isAuthorized, runPlugin, selectFrom)
 import Network.Haskbot.SlashCommand (SlashCom, command, fromParams)
 import Network.HTTP.Types (ok200, badRequest400, unauthorized401)
-import Network.Wai (Request, Response)
+import Network.Wai (Request, Response, Application)
 import Network.Wai.Handler.Warp (run)
 
 -- internal functions
@@ -32,10 +30,12 @@ sendResponsesToSlack :: Environment -> IO ()
 sendResponsesToSlack = runReaderT sendFromQueue
 
 processSlackRequests :: Environment -> [Plugin] -> IO ()
-processSlackRequests env plugins = run port app
+processSlackRequests env plugins = run port (app env plugins)
   where
     port = listenOn $ config env
-    app req resp = runner env plugins req >>= resp
+
+app :: Environment -> [Plugin] -> Application
+app env plugins req resp = runner env plugins req >>= resp
 
 runner :: Environment -> [Plugin] -> Request -> IO Response
 runner env plugins req = do
