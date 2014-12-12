@@ -1,13 +1,13 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Network.Haskbot.Plugin.Help (register) where
+module Haskbot.Plugin.Help (register) where
 
 import Control.Applicative ((<$>))
 import Data.List (find)
 import qualified Data.Text as T
-import Network.Haskbot.Plugin
-import Network.Haskbot.SlashCommand
-import Network.Haskbot.Types
+import Haskbot.Plugin
+import Haskbot.SlashCommand
+import Haskbot.Types
 
 -- constants
 

@@ -4,7 +4,7 @@
 --   /incoming/ integration- the means via which Haskbot replies to Slack.
 --   Currently only simple text replies are supported, but this will be
 --   expanded to support fully-Slack-formatted messages in the future.
-module Network.Haskbot.Incoming
+module Haskbot.Incoming
 (
 -- * The Incoming type
   Incoming (..)
@@ -21,11 +21,10 @@ import Control.Monad.Reader (MonadIO, asks, liftIO)
 import Data.Aeson (ToJSON, (.=), encode, object, toJSON)
 import Data.ByteString.Lazy (ByteString)
 import Data.Text (Text)
-import Network.Haskbot.Config (incUrl)
-import Network.Haskbot.Internal.Environment
-  (EnvironT, config, incQueue, netConn)
-import Network.Haskbot.Internal.Request (jsonContentType)
-import Network.Haskbot.Types (Channel, getAddress)
+import Haskbot.Config (incUrl)
+import Haskbot.Internal.Environment (EnvironT, config, incQueue, netConn)
+import Haskbot.Internal.Request (jsonContentType)
+import Haskbot.Types (Channel, getAddress)
 import Network.HTTP.Conduit -- basically everything
 import Network.HTTP.Types (methodPost, status200)
 

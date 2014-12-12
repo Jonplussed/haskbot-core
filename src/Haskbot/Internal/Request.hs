@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Network.Haskbot.Internal.Request
+module Haskbot.Internal.Request
 ( Params
 , jsonContentType
 , textContentType
@@ -15,10 +15,11 @@ import Control.Monad.Error (liftIO, throwError)
 import Data.ByteString.Lazy (fromStrict)
 import Data.Text (Text)
 import Data.Text.Encoding (decodeUtf8)
+import Haskbot.Internal.Environment (HaskbotM)
+
 import qualified Data.Map as M
 import qualified Network.HTTP.Types as N
 import qualified Network.Wai as W
-import Network.Haskbot.Internal.Environment (HaskbotM)
 
 type Params = M.Map Text Text
 

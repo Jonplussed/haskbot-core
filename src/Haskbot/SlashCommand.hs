@@ -4,7 +4,7 @@
 --   command/ integration. A "Network.Haskbot.Plugin" handler function is given
 --   direct access to this data type when a /slash command/ is invoked via
 --   Slack.
-module Network.Haskbot.SlashCommand
+module Haskbot.SlashCommand
 (
 -- * The Slash Command type
   SlashCom (..)
@@ -14,9 +14,9 @@ module Network.Haskbot.SlashCommand
 
 import Control.Applicative ((<$>), (<*>))
 import Data.Text (Text)
-import Network.Haskbot.Internal.Environment (HaskbotM)
-import Network.Haskbot.Internal.Request (Params, reqParam, optParam)
-import Network.Haskbot.Types
+import Haskbot.Internal.Environment (HaskbotM)
+import Haskbot.Internal.Request (Params, reqParam, optParam)
+import Haskbot.Types
 import Network.Wai (Request)
 
 -- | Encapsulates all data provided by a request from a Slack /slash command/

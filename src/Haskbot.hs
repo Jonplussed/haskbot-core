@@ -27,15 +27,15 @@
 --   Be sure to create a Slack incoming integration (usually named /Haskbot/)
 --   and set the 'incEndpoint' and 'incToken' to their corresponding values, so
 --   that Slack can receive replies from Haskbot.
-module Network.Haskbot
+module Haskbot
 (
 -- * Run a Haskbot server
   haskbot
 ) where
 
-import Network.Haskbot.Internal.Server (webServer)
-import Network.Haskbot.Config (Config)
-import Network.Haskbot.Plugin (Plugin)
+import Haskbot.Internal.Server (webServer)
+import Haskbot.Config (Config)
+import Haskbot.Plugin (Plugin)
 
 -- | Run the listed plugins on a Haskbot server with the given config
 haskbot :: Config   -- ^ Your custom-created config

@@ -34,7 +34,7 @@
 --   integration's secret token as the remaining argument. Rebuild and run the
 --   server. Typing @\/hello_word@ into any Slack channel should return a
 --   Haskbot response of /Hello, world!/
-module Network.Haskbot.Plugin
+module Haskbot.Plugin
 (
 -- * The Plugin type
   Plugin (..)
@@ -50,10 +50,10 @@ module Network.Haskbot.Plugin
 import Control.Monad.Reader (lift)
 import Data.List (find)
 import Data.Text (Text)
-import Network.Haskbot.Incoming (Incoming (Incoming), addToSendQueue)
-import Network.Haskbot.Internal.Environment (HaskbotM)
-import Network.Haskbot.SlashCommand (SlashCom (..), token)
-import Network.Haskbot.Types
+import Haskbot.Incoming (Incoming (Incoming), addToSendQueue)
+import Haskbot.Internal.Environment (HaskbotM)
+import Haskbot.SlashCommand (SlashCom (..), token)
+import Haskbot.Types
 
 
 -- | The type of function run by a plugin. It receives the full
